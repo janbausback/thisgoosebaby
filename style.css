@@ -69,15 +69,13 @@ body {
 
 .hero__footer {
   position: absolute;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 2rem);
+  top: 69%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   color: #cdb4f2;
   font-family: "Courier New", Courier, monospace;
   text-align: center;
   white-space: nowrap;
-  pointer-events: none;
-  transition: left 0.12s ease-out, top 0.12s ease-out;
 }
 
 .hero__subline {
@@ -102,10 +100,6 @@ body {
   .hero__headline {
     padding: 1.25rem;
     font-size: 2rem;
-  }
-
-  .hero__footer {
-    bottom: 3rem;
   }
 
   .hero__subline {
