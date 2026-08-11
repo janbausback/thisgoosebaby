@@ -88,7 +88,7 @@
   }
 
   function computeRadius(w, h, inset) {
-    var r = clampNum(Math.min(w, h) * 0.06, 22, 60);
+    var r = clampNum(Math.min(w, h) * 0.01, 4, 10);
     var maxAllowed = Math.max((Math.min(w, h) - 2 * inset) / 2, 0);
     return Math.min(r, maxAllowed);
   }
