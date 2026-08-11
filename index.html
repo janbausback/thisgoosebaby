@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>THIS GOOSE BABY</title>
-  <meta name="description" content="THIS GOOSE BABY — gallery space opening Fall 2026, Eisenbahnstraße 5, Berlin Kreuzberg." />
+  <title>STUDIO KOLCHINA & GORDON</title>
+  <meta name="description" content="STUDIO KOLCHINA & GORDON — gallery space opening Fall 2026, Eisenbahnstraße 5, Berlin Kreuzberg." />
   <meta name="theme-color" content="#000000" />
 
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="apple-touch-icon" href="favicon.png" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="THIS GOOSE BABY" />
+  <meta property="og:title" content="STUDIO KOLCHINA & GORDON" />
   <meta property="og:description" content="Gallery space opening Fall 2026, Eisenbahnstraße 5, Berlin Kreuzberg." />
   <meta property="og:image" content="preview.jpg" />
-  <meta property="og:site_name" content="THIS GOOSE BABY" />
+  <meta property="og:site_name" content="STUDIO KOLCHINA & GORDON" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="THIS GOOSE BABY" />
+  <meta name="twitter:title" content="STUDIO KOLCHINA & GORDON" />
   <meta name="twitter:description" content="Gallery space opening Fall 2026, Eisenbahnstraße 5, Berlin Kreuzberg." />
   <meta name="twitter:image" content="preview.jpg" />
 
@@ -49,11 +49,17 @@
 
     <div class="hero__scrim"></div>
 
-    <h1 class="hero__headline">
-      <span class="hero__word hero__word--left">THIS</span>
-      <span class="hero__word hero__word--center">GOOSE</span>
-      <span class="hero__word hero__word--right">BABY</span>
-    </h1>
+    <h1 class="visually-hidden">STUDIO KOLCHINA &amp; GORDON</h1>
+
+    <svg class="hero-marquee" aria-hidden="true" focusable="false">
+      <defs>
+        <path id="framePath"></path>
+      </defs>
+      <text id="frameMeasure" class="hero-marquee__text hero-marquee__measure"></text>
+      <text class="hero-marquee__text">
+        <textPath id="frameTextPath" xlink:href="#framePath" href="#framePath" startOffset="0%"></textPath>
+      </text>
+    </svg>
 
     <div class="hero__footer">
       <p class="hero__subline">Opening Fall 2026</p>
@@ -63,5 +69,7 @@
       </p>
     </div>
   </main>
+
+  <script src="marquee.js"></script>
 </body>
 </html>

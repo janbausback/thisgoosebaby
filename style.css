@@ -41,30 +41,38 @@ body {
   pointer-events: none;
 }
 
-.hero__headline {
+.hero-marquee {
   position: absolute;
-  top: env(safe-area-inset-top, 0px);
-  left: env(safe-area-inset-left, 0px);
-  right: env(safe-area-inset-right, 0px);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 0.9rem 0.6rem;
-  color: #cdb4f2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hero-marquee__text {
+  fill: #cdb4f2;
   font-family: "Arial Black", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.1rem, 5.5vw, 1.6rem);
   font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  font-size: clamp(0.78rem, 3.4vw, 1rem);
+  letter-spacing: -0.01em;
   filter: url(#handPrinted);
 }
 
-.hero__word--center {
-  text-align: center;
+.hero-marquee__measure {
+  visibility: hidden;
 }
 
-.hero__word--right {
-  text-align: right;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .hero__footer {
@@ -97,9 +105,9 @@ body {
 }
 
 @media (min-width: 700px) {
-  .hero__headline {
-    padding: 1.25rem;
-    font-size: 2rem;
+  .hero-marquee__text {
+    font-size: 1.1rem;
+    letter-spacing: 0;
   }
 
   .hero__subline {
