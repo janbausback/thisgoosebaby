@@ -56,7 +56,11 @@ body {
   font-weight: 900;
   font-size: clamp(0.78rem, 3.4vw, 1rem);
   letter-spacing: -0.01em;
-  filter: url(#handPrinted);
+  filter: url(#handPrintedRing);
+  /* Forces Safari to composite this element on its own layer instead of
+     repainting the surrounding stacking context on every filtered frame. */
+  transform: translateZ(0);
+  will-change: filter;
 }
 
 .hero-marquee__measure {

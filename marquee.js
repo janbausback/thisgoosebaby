@@ -4,23 +4,75 @@
   var UNIT = "STUDIO KOLCHINA & GORDON • ";
   var SPEED_PX_PER_SEC = 60; // moderate/readable; tune 50–70 after eyeballing
   var RESIZE_DEBOUNCE_MS = 150;
-  // The animated ring re-triggers the hand-printed SVG filter (turbulence +
-  // displacement + blur) over a viewport-sized element on every DOM write.
-  // That's expensive enough that writing it 60x/sec makes Safari stutter.
-  // Capping writes to ~30fps keeps the filter cost sane while still reading
-  // as smooth motion; the position itself still accumulates every rAF tick
-  // (below) so average speed stays correct regardless of paint rate.
+  // The animated ring re-triggers the hand-printed SVG filter (displacement +
+  // blur, see #handPrintedRing — feTurbulence is pre-baked, not live) over a
+  // viewport-sized element on every DOM write. That's still expensive enough
+  // that writing it 60x/sec makes Safari stutter. Capping writes to ~30fps
+  // keeps the filter cost sane while still reading as smooth motion; the
+  // position itself still accumulates every rAF tick (below) so average
+  // speed stays correct regardless of paint rate.
   var PAINT_INTERVAL_MS = 33;
 
-  var svg        = document.querySelector(".hero-marquee");
-  var pathEl     = document.getElementById("framePath");
-  var measureEl  = document.getElementById("frameMeasure");
-  var textPathEl = document.getElementById("frameTextPath");
-  var heroEl     = document.querySelector(".hero");
+  var svg          = document.querySelector(".hero-marquee");
+  var pathEl       = document.getElementById("framePath");
+  var measureEl    = document.getElementById("frameMeasure");
+  var textPathEl   = document.getElementById("frameTextPath");
+  var heroEl       = document.querySelector(".hero");
+  var ringFilterEl = document.getElementById("handPrintedRing");
+  var ringNoiseEl  = document.getElementById("ringNoise");
 
-  if (!svg || !pathEl || !measureEl || !textPathEl || !heroEl) return;
+  if (!svg || !pathEl || !measureEl || !textPathEl || !heroEl || !ringFilterEl || !ringNoiseEl) return;
 
   var currentRepeats = 0;
+  var noiseW = 0, noiseH = 0; // size the baked ring-noise texture was last generated at
+
+  // Renders feTurbulence once into a bitmap instead of leaving it live in the
+  // ring's filter chain, where Safari would otherwise regenerate that (fixed-
+  // seed, therefore always-identical) noise on every animation frame.
+  function bakeRingNoise(w, h) {
+    w = Math.max(1, Math.ceil(w));
+    h = Math.max(1, Math.ceil(h));
+    var markup =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' +
+      '<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.3 0.35" numOctaves="1" seed="7" /></filter>' +
+      '<rect width="100%" height="100%" filter="url(#n)" /></svg>';
+    var blob = new Blob([markup], { type: "image/svg+xml;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      var dataUrl = canvas.toDataURL("image/png");
+      ringNoiseEl.setAttributeNS("http://www.w3.org/1999/xlink", "href", dataUrl);
+      ringNoiseEl.setAttribute("href", dataUrl);
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); };
+    img.src = url;
+  }
+
+  function updateRingNoise(w, h) {
+    if (w === noiseW && h === noiseH) return;
+    noiseW = w;
+    noiseH = h;
+
+    var margin = 0.2;
+    var rx = -w * margin, ry = -h * margin;
+    var rw = w * (1 + 2 * margin), rh = h * (1 + 2 * margin);
+
+    ringFilterEl.setAttribute("x", rx);
+    ringFilterEl.setAttribute("y", ry);
+    ringFilterEl.setAttribute("width", rw);
+    ringFilterEl.setAttribute("height", rh);
+    ringNoiseEl.setAttribute("x", rx);
+    ringNoiseEl.setAttribute("y", ry);
+    ringNoiseEl.setAttribute("width", rw);
+    ringNoiseEl.setAttribute("height", rh);
+
+    bakeRingNoise(rw, rh);
+  }
 
   // Animation state, driven by rAF (not SMIL — see tick() for why).
   var oneUnitPct = 0;   // one repeat-unit's length, in % of totalLen
@@ -64,6 +116,7 @@
     if (w <= 0 || h <= 0) return;
 
     svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+    updateRingNoise(w, h);
 
     var inset  = computeInset(w, h);
     var radius = computeRadius(w, h, inset);

@@ -33,6 +33,23 @@
         <feFuncA type="linear" slope="18" intercept="-7" />
       </feComponentTransfer>
     </filter>
+    <!--
+      Same look as #handPrinted, but for the animated ring text: feTurbulence
+      is swapped for a pre-baked feImage texture (written by marquee.js).
+      Safari recomputes feTurbulence's Perlin noise from scratch on every
+      paint even though a fixed seed makes its output identical every time —
+      that's the actual cost behind the ring's stutter, not the displacement/
+      blur/alpha steps. Baking it once per layout and sampling a bitmap
+      instead removes that redundant per-frame work.
+    -->
+    <filter id="handPrintedRing" x="0" y="0" width="0" height="0" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse">
+      <feImage id="ringNoise" result="noise" x="0" y="0" width="0" height="0" preserveAspectRatio="none" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1" xChannelSelector="R" yChannelSelector="G" result="scattered" />
+      <feGaussianBlur in="scattered" stdDeviation="0.5" result="softened" />
+      <feComponentTransfer in="softened">
+        <feFuncA type="linear" slope="18" intercept="-7" />
+      </feComponentTransfer>
+    </filter>
   </svg>
 
   <main class="hero">
