@@ -13,11 +13,9 @@
 
   if (!svg || !pathEl || !measureEl || !textPathEl || !heroEl) return;
 
-  var reduceMotionMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
   var currentRepeats = 0;
 
   // Animation state, driven by rAF (not SMIL — see tick() for why).
-  var animating = false;
   var oneUnitPct = 0;   // one repeat-unit's length, in % of totalLen
   var percentPerMs = 0; // travel speed, in % of totalLen per millisecond
   var offsetPct = 0;    // current position within [0, oneUnitPct)
@@ -79,8 +77,7 @@
     // and hoping it's enough. This is what makes it adapt exactly to any
     // screen size/aspect ratio.
     var repeatsPerLoop = Math.max(1, Math.round(totalLen / unitLen));
-    var reduceMotion = reduceMotionMQ.matches;
-    var laps = reduceMotion ? 1 : 2; // 2nd lap = animation slack, not visible
+    var laps = 2; // 2nd lap = animation slack, not visible
     var repeats = repeatsPerLoop * laps;
 
     if (repeats !== currentRepeats) {
@@ -91,12 +88,9 @@
     textPathEl.setAttribute("textLength", String(totalLen * laps));
     textPathEl.setAttribute("lengthAdjust", "spacing");
 
-    if (reduceMotion) {
-      animating = false;
-      textPathEl.setAttribute("startOffset", "0%");
-      return;
-    }
-
+    // Animates regardless of prefers-reduced-motion — intentional: this is
+    // decorative/ambient motion the site wants running unconditionally.
+    //
     // The text block only ever extends forward from startOffset, so it must
     // never go positive, or the block's start point drags past the path's
     // own start (position 0), leaving a growing uncovered gap at the
@@ -109,7 +103,6 @@
     oneUnitPct = 100 / repeatsPerLoop; // exact, in % of totalLen
     var exactUnitLen = totalLen / repeatsPerLoop;
     percentPerMs = (SPEED_PX_PER_SEC / exactUnitLen) * oneUnitPct / 1000;
-    animating = true;
   }
 
   function tick(ts) {
@@ -117,7 +110,7 @@
     var dt = ts - lastTs;
     lastTs = ts;
 
-    if (animating && oneUnitPct > 0) {
+    if (oneUnitPct > 0) {
       offsetPct = (offsetPct + percentPerMs * dt) % oneUnitPct;
       // startOffset must increase over time (toward 0, never past it) for
       // the snake to travel clockwise while staying gap-safe — see layout().
@@ -137,9 +130,4 @@
   requestAnimationFrame(tick);
   window.addEventListener("resize", scheduleLayout);
   window.addEventListener("orientationchange", scheduleLayout);
-  if (reduceMotionMQ.addEventListener) {
-    reduceMotionMQ.addEventListener("change", layout);
-  } else if (reduceMotionMQ.addListener) {
-    reduceMotionMQ.addListener(layout);
-  }
 })();
