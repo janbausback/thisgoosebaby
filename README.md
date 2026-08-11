@@ -1,2 +1,2 @@
 # thisgoosebaby
-Homepage of STUDIO KOLCHINA & GORDON gallery space
+Homepage of Studio Kolchina & Gordon studio space
