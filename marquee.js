@@ -4,6 +4,13 @@
   var UNIT = "STUDIO KOLCHINA & GORDON • ";
   var SPEED_PX_PER_SEC = 60; // moderate/readable; tune 50–70 after eyeballing
   var RESIZE_DEBOUNCE_MS = 150;
+  // The animated ring re-triggers the hand-printed SVG filter (turbulence +
+  // displacement + blur) over a viewport-sized element on every DOM write.
+  // That's expensive enough that writing it 60x/sec makes Safari stutter.
+  // Capping writes to ~30fps keeps the filter cost sane while still reading
+  // as smooth motion; the position itself still accumulates every rAF tick
+  // (below) so average speed stays correct regardless of paint rate.
+  var PAINT_INTERVAL_MS = 33;
 
   var svg        = document.querySelector(".hero-marquee");
   var pathEl     = document.getElementById("framePath");
@@ -20,6 +27,7 @@
   var percentPerMs = 0; // travel speed, in % of totalLen per millisecond
   var offsetPct = 0;    // current position within [0, oneUnitPct)
   var lastTs = null;
+  var lastPaintTs = null;
 
   function clampNum(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -112,9 +120,12 @@
 
     if (oneUnitPct > 0) {
       offsetPct = (offsetPct + percentPerMs * dt) % oneUnitPct;
-      // startOffset must increase over time (toward 0, never past it) for
-      // the snake to travel clockwise while staying gap-safe — see layout().
-      textPathEl.setAttribute("startOffset", (offsetPct - oneUnitPct) + "%");
+      if (lastPaintTs === null || ts - lastPaintTs >= PAINT_INTERVAL_MS) {
+        lastPaintTs = ts;
+        // startOffset must increase over time (toward 0, never past it) for
+        // the snake to travel clockwise while staying gap-safe — see layout().
+        textPathEl.setAttribute("startOffset", (offsetPct - oneUnitPct) + "%");
+      }
     }
 
     requestAnimationFrame(tick);
