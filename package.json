@@ -1,0 +1,23 @@
+{
+  "name": "zwischentoene",
+  "version": "1.0.0",
+  "description": "Zwischentöne — a temporary installation by Clara Twele and Galina Kolchina. Studio Kolchina & Gordon.",
+  "scripts": {
+    "build": "npm run build:images && npm run build:icons && npm run build:html",
+    "build:images": "node scripts/build-images.mjs",
+    "build:icons": "node scripts/build-icons.mjs",
+    "build:html": "node scripts/build-html.mjs",
+    "build:og": "node scripts/screenshot.mjs && npm run build:html",
+    "serve": "node scripts/serve.mjs",
+    "start": "npm run serve"
+  },
+  "license": "UNLICENSED",
+  "type": "module",
+  "dependencies": {
+    "sharp": "^0.35.4"
+  },
+  "private": true,
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

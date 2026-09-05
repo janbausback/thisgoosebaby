@@ -1,0 +1,74 @@
+{
+  "bg": {
+    "widths": {
+      "480": "/assets/bg-480.3983d471.webp",
+      "960": "/assets/bg-960.7cdf46e3.webp",
+      "1440": "/assets/bg-1440.aab4de95.webp"
+    },
+    "srcset": "/assets/bg-480.3983d471.webp 480w, /assets/bg-960.7cdf46e3.webp 960w, /assets/bg-1440.aab4de95.webp 1440w",
+    "w": 1440,
+    "h": 2030,
+    "src": "/assets/bg-1440.aab4de95.webp"
+  },
+  "square": {
+    "widths": {
+      "480": "/assets/square-480.76346fd9.webp",
+      "720": "/assets/square-720.37e5a7f9.webp",
+      "960": "/assets/square-960.5c67b016.webp"
+    },
+    "srcset": "/assets/square-480.76346fd9.webp 480w, /assets/square-720.37e5a7f9.webp 720w, /assets/square-960.5c67b016.webp 960w",
+    "w": 960,
+    "h": 960,
+    "src": "/assets/square-960.5c67b016.webp"
+  },
+  "teppich1": {
+    "widths": {
+      "480": "/assets/teppich1-480.e55126f3.webp",
+      "960": "/assets/teppich1-960.f3061161.webp"
+    },
+    "srcset": "/assets/teppich1-480.e55126f3.webp 480w, /assets/teppich1-960.f3061161.webp 960w",
+    "w": 960,
+    "h": 1436,
+    "src": "/assets/teppich1-960.f3061161.webp"
+  },
+  "teppich2": {
+    "widths": {
+      "480": "/assets/teppich2-480.7c9fbc14.webp",
+      "960": "/assets/teppich2-960.635b9602.webp"
+    },
+    "srcset": "/assets/teppich2-480.7c9fbc14.webp 480w, /assets/teppich2-960.635b9602.webp 960w",
+    "w": 960,
+    "h": 1355,
+    "src": "/assets/teppich2-960.635b9602.webp"
+  },
+  "teppich3": {
+    "widths": {
+      "480": "/assets/teppich3-480.557427f3.webp",
+      "960": "/assets/teppich3-960.ce1013f8.webp"
+    },
+    "srcset": "/assets/teppich3-480.557427f3.webp 480w, /assets/teppich3-960.ce1013f8.webp 960w",
+    "w": 960,
+    "h": 1275,
+    "src": "/assets/teppich3-960.ce1013f8.webp"
+  },
+  "icon192": {
+    "src": "/assets/icon-192.076b0089.png"
+  },
+  "icon512": {
+    "src": "/assets/icon-512.aa4dc04c.png"
+  },
+  "icon512m": {
+    "src": "/assets/icon-512-maskable.a0784f5f.png"
+  },
+  "css": {
+    "src": "/assets/main.2147697a.css"
+  },
+  "js": {
+    "src": "/assets/main.56d1735a.js"
+  },
+  "og": {
+    "src": "/assets/og-image.4f4c8d17.jpg",
+    "w": 1200,
+    "h": 630
+  }
+}

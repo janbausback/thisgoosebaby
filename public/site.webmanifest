@@ -1,0 +1,14 @@
+{
+  "name": "Zwischentöne — Studio Kolchina & Gordon",
+  "short_name": "Zwischentöne",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#37161d",
+  "theme_color": "#37161d",
+  "icons": [
+    { "src": "/assets/icon-192.076b0089.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512.aa4dc04c.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512-maskable.a0784f5f.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
