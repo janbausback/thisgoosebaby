@@ -131,6 +131,49 @@ async function flatCore(buf) {
     .toBuffer();
 }
 
+/**
+ * GIMP's Gaussian softener: blur a copy of the layer and blend it back over the
+ * original, Normal mode, at a fraction of full opacity. Sigma is a fraction of
+ * the image's own width so the 480w and 960w files look identical once CSS has
+ * scaled them to the same size on screen.
+ *
+ * The blend runs on premultiplied pixels. Blurring straight RGBA drags the RGB
+ * of fully transparent pixels — black, in an exported cutout — in under the
+ * edge, which rings every rug with a dark halo.
+ */
+const SOFTEN = { sigma: 5, opacity: 0.47, ref: 480 };
+
+async function soften(buf, sigma, opacity) {
+  const { data: o, info } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { width, height } = info;
+  const n = width * height;
+
+  const pre = Buffer.allocUnsafe(n * 4);
+  for (let i = 0; i < n; i++) {
+    const a = o[i * 4 + 3];
+    pre[i * 4] = (o[i * 4] * a) / 255;
+    pre[i * 4 + 1] = (o[i * 4 + 1] * a) / 255;
+    pre[i * 4 + 2] = (o[i * 4 + 2] * a) / 255;
+    pre[i * 4 + 3] = a;
+  }
+  const b = await sharp(pre, { raw: { width, height, channels: 4 } }).blur(sigma).raw().toBuffer();
+
+  // Premultiplied `over`: out = S + D·(1 − Sa), S being the blurred layer at `opacity`.
+  const out = Buffer.allocUnsafe(n * 4);
+  for (let i = 0; i < n; i++) {
+    const sa = (b[i * 4 + 3] / 255) * opacity;
+    const inv = 1 - sa;
+    const oa = o[i * 4 + 3];
+    const a = b[i * 4 + 3] * opacity + oa * inv;
+    for (let c = 0; c < 3; c++) {
+      const px = b[i * 4 + c] * opacity + ((o[i * 4 + c] * oa) / 255) * inv;
+      out[i * 4 + c] = a > 0 ? Math.min(255, (px * 255) / a) : 0;
+    }
+    out[i * 4 + 3] = a;
+  }
+  return sharp(out, { raw: { width, height, channels: 4 } }).png().toBuffer();
+}
+
 // ── Drifting rugs ──────────────────────────────────────────────────────────
 // Two shapes of source arrive here. A cutout carries its own alpha, and the
 // transparent margin is most of the file and none of the picture, so it is
@@ -152,9 +195,20 @@ for (const n of [1, 2, 3]) {
     console.log(`teppich${n}  (opaque photo, cropped to the flat weave)`);
   }
 
-  patch[`teppich${n}`] = await emit(`teppich${n}`, [480, 960], (w) =>
-    sharp(source).resize({ width: w }).webp({ quality: 52, effort: 6, alphaQuality: 85 }).toBuffer()
-  );
+  // The softened edge fades outward, so it needs transparent room to fade into:
+  // the rug is resized to leave a margin rather than blurring against the frame,
+  // which would cut the feather off square. Body-to-frame ratio is identical at
+  // both widths, so the two variants stay interchangeable.
+  patch[`teppich${n}`] = await emit(`teppich${n}`, [480, 960], async (w) => {
+    const sigma = (SOFTEN.sigma * w) / SOFTEN.ref;
+    const pad = Math.ceil(sigma * 3);
+    const body = await sharp(source).resize({ width: w - 2 * pad }).toBuffer();
+    const padded = await sharp(body)
+      .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .toBuffer();
+    const soft = await soften(padded, sigma, SOFTEN.opacity);
+    return sharp(soft).webp({ quality: 52, effort: 6, alphaQuality: 85 }).toBuffer();
+  });
 }
 
 const manifest = mergeManifest(patch);

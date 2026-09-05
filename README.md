@@ -62,6 +62,32 @@ Quality is set low on purpose. The rugs and the background are near-flat woven
 fields whose own grain sets the noise floor, so q70 costs roughly 2.3× the bytes
 of q50 for under 1 dB of PSNR. The whole initial view is about 30 KB on mobile.
 
+### Softened rugs
+
+The drifting rugs carry the reference artwork's Gaussian softener: a blurred
+copy of the layer blended back over the original, Normal mode at 47% opacity —
+the same operation as GIMP's blur dialog with its blending-options opacity.
+`SOFTEN` at the top of the rug section in `scripts/build-images.mjs` is the only
+knob; `sigma: 5` is a slight softening, `10` turns it into a pronounced glow.
+
+It is baked into the WebP at build time rather than applied as a CSS `filter`.
+The rugs drift and are draggable, so a runtime blur would re-rasterise a large
+element every frame — expensive precisely where the budget is tightest. Baked,
+it costs nothing at runtime.
+
+Sigma is a fraction of each file's own width, so the 480w and 960w variants look
+identical once CSS has scaled them to the same size. Each rug is resized to
+leave a transparent margin before blurring, because the feather needs somewhere
+to fade into — blurred against the frame it would be cut off square. The blend
+runs on premultiplied pixels: blurring straight RGBA drags the black of fully
+transparent pixels in under the edge and rings every rug with a dark halo.
+
+The bytes go both ways. Losing the high-frequency weave detail makes the large
+files compress better — the 960w set went from 35.2 KB to 29.8 KB — while the
+480w set grew from 3.8 KB to 8.8 KB, the feathered alpha gradient costing more
+than the tiny flat originals ever did. High-DPR phones request the 960w set, so
+in practice this made the page slightly lighter, not heavier.
+
 ### Icons
 
 The Zwischentöne mark is a single-line wordmark at roughly 6.8:1. Squeezed into
@@ -127,7 +153,7 @@ Measured on the built site — Moto G4, Slow 4G (1.6 Mbps, 150 ms RTT), 4× CPU:
 | | mobile | desktop |
 |---|---|---|
 | requests | 8 | 8 |
-| transfer, Brotli | 51 KB | 57 KB |
+| transfer, Brotli | 44 KB | 44 KB |
 | FCP | 284 ms | — |
 | loading screen fully painted | 580 ms | — |
 | LCP | 2.0 s | — |
