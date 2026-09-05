@@ -44,7 +44,7 @@ npm run build          # images → icons → HTML
 npm run build:images   # sources → responsive WebP
 npm run build:icons    # favicons from the Zwischentöne mark
 npm run build:html     # templates → public/, inlining CSS and SVGs
-npm run build:og       # social preview image (needs Playwright, see below)
+npm run build:og       # social preview image, cropped from src/assets/preview.png
 ```
 
 `npm run build` is safe to re-run at any time and is what you want after
@@ -72,22 +72,12 @@ records why the three obvious ways of isolating it do not work.
 
 ### Social preview image
 
-`build:og` drives a real browser, waits out the loading screen, screenshots the
-main screen and writes `og-image.<hash>.jpg` at 1200×630. It then re-runs
-`build:html` so the meta tags pick up the new filename.
-
-The capture happens at 1800×945 — the same 1200:630 ratio, scaled down
-afterwards. At 630 px tall the menu does not fit and the last item is clipped,
-and because the type scale is capped in rem, extra viewport height buys real
-room rather than just scaling up with it. The script refuses to write a preview
-that overflows its frame, so adding another menu item fails loudly instead of
-silently cropping. Playwright is only
-needed for this one step:
-
-```bash
-npm i -D playwright && npx playwright install chromium
-npm run build:og
-```
+The OG/Twitter card is a fixed design — the Studio Kolchina & Gordon wordmark
+on blue, over the site's burgundy ground — not a screenshot of the live page.
+`build:og` crops `src/assets/preview.png` (2746×1296) to the standard 1200×630
+card size with `sharp`'s `cover` fit, writes `og-image.<hash>.jpg`, and then
+re-runs `build:html` so the meta tags pick up the new filename. Replace
+`src/assets/preview.png` and re-run `npm run build:og` to update it.
 
 ## Replacing assets
 

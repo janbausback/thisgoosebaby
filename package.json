@@ -7,7 +7,7 @@
     "build:images": "node scripts/build-images.mjs",
     "build:icons": "node scripts/build-icons.mjs",
     "build:html": "node scripts/build-html.mjs",
-    "build:og": "node scripts/screenshot.mjs && npm run build:html",
+    "build:og": "node scripts/build-og.mjs && npm run build:html",
     "serve": "node scripts/serve.mjs",
     "start": "npm run serve"
   },
