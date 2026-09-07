@@ -66,7 +66,7 @@ npm run build          # images → icons → HTML
 npm run build:images   # sources → responsive WebP
 npm run build:icons    # flat burgundy favicons
 npm run build:html     # templates → public/, inlining CSS and SVGs
-npm run build:og       # social preview image, cropped from src/assets/preview.png
+npm run build:og       # social preview image, cropped from src/assets/preview2.jpg
 ```
 
 `npm run build` is safe to re-run at any time and is what you want after
@@ -176,12 +176,11 @@ rasterisation, no glyph isolation.
 
 ### Social preview image
 
-The OG/Twitter card is a fixed design — the Studio Kolchina & Gordon wordmark
-on blue, over the site's burgundy ground — not a screenshot of the live page.
-`build:og` crops `src/assets/preview.png` (2746×1296) to the standard 1200×630
-card size with `sharp`'s `cover` fit, writes `og-image.<hash>.jpg`, and then
-re-runs `build:html` so the meta tags pick up the new filename. Replace
-`src/assets/preview.png` and re-run `npm run build:og` to update it.
+The OG/Twitter card is a photo of the shopfront window, not a screenshot of the
+live page. `build:og` crops `src/assets/preview2.jpg` (1350×602) to the standard
+1200×630 card size with `sharp`'s `cover` fit, writes `og-image.<hash>.jpg`, and
+then re-runs `build:html` so the meta tags pick up the new filename. Replace
+`src/assets/preview2.jpg` and re-run `npm run build:og` to update it.
 
 ## Replacing assets
 

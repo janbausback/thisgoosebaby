@@ -1,16 +1,15 @@
 #!/usr/bin/env node
 /**
- * Social preview image: crop the designed preview graphic
- * (src/assets/preview.png — the Studio Kolchina & Gordon wordmark on a
- * blue ground over the site's burgundy background) down to the standard
- * 1200×630 OG/Twitter card size.
+ * Social preview image: crop the shopfront window photo
+ * (src/assets/preview2.jpg) down to the standard 1200×630 OG/Twitter card
+ * size.
  * Run via `npm run build:og`, which re-renders the HTML afterwards so the
  * meta tags pick up the new hashed filename.
  */
 import sharp from 'sharp';
 import { writeHashed, mergeManifest, kb } from './lib/manifest.mjs';
 
-const jpg = await sharp('src/assets/preview.png')
+const jpg = await sharp('src/assets/preview2.jpg')
   .resize(1200, 630, { fit: 'cover' })
   .jpeg({ quality: 86, mozjpeg: true })
   .toBuffer();
