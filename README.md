@@ -269,23 +269,20 @@ a large desktop screen where `cover` scales it up.
   `src/zwischentoene.html` and the `exhibition` object in
   `scripts/build-html.mjs`.
 - **The exhibition link on the landing page has no reliable contrast.** It is
-  pale green (`#D5DCC1`, relative luminance 0.69) sitting at 50% height, where
-  the scrim's top-down gradient has already faded to nothing. Measured against
-  the video behind it, the worst case is **1.05:1 on mobile and 1.13:1 on
-  desktop** — far below the 3:1 that text this size needs, and low enough that
-  the site's only navigation disappears entirely on some frames.
-
-  A full-width band across 42–58% of the frame was added for this and reached
-  5.1:1 / 5.6:1, then removed by request because it read as a shadow over the
-  video. This is a known trade in favour of the image, not an oversight. If it
-  is ever revisited, that band is the fix — restore it on `.hero__scrim` in
-  `src/css/landing.css`. (A radial pool around the text was tried first and
-  rejected: `radial-gradient` sizes to its box's farthest corner, so it stays
-  ~40% opaque at the box edge and draws a visible rectangle over the video.)
+  set in the site's own burgundy (`#37161d`, the same `--bg` as the exhibition
+  page), which sits close to black — against the video behind it this measures
+  **1.22:1 on mobile and 1.34:1 on desktop at worst**, far below the 3:1 that
+  text this size needs. It reads fine against the bright parts of the video
+  (up to 10.9:1 in the frames sampled) and nearly vanishes against the dark
+  interior of the shopfront window. This is an explicit style choice — the
+  burgundy was asked for by name to match the main page's palette — not an
+  oversight, and no scrim currently compensates for it (one was tried for the
+  previous colour and removed by request; see the git history on
+  `.hero__scrim` in `src/css/landing.css` if it's worth revisiting for this
+  colour too).
 
   Measured by compositing the scrim over 17 frames sampled across the video,
   mapping the link's real bounding box through `object-fit: cover`, and taking
-  the worst pixel. Re-measure if the video is replaced — a darker clip would
-  improve this on its own.
+  the worst and best pixel in each. Re-measure if the video is replaced.
 - Body copy on the exhibition page sits over the burgundy ground and the rugs,
   not over video, so it is not subject to the above.
