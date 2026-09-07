@@ -131,9 +131,9 @@ is recorded as deliberate in the comment above `tick()` in `src/js/marquee.js`:
 ambient motion the page wants running unconditionally. Flip it if that stance
 ever changes.
 
-`.hero__scrim` is two stacked washes: the original gradient along the top, and
-a band across the middle that exists to keep the exhibition link legible — see
-Performance below, and re-measure if the video is replaced.
+`.hero__scrim` is the original gradient along the top only. A band across the
+middle was added to keep the exhibition link legible and then removed by
+request — see Performance below before assuming the link is readable.
 
 ### Drifting rugs
 
@@ -259,23 +259,24 @@ a large desktop screen where `cover` scales it up.
   description and in the `ExhibitionEvent` JSON-LD; changing them means editing
   `src/zwischentoene.html` and the `exhibition` object in
   `scripts/build-html.mjs`.
-- **The exhibition link on the landing page needed a scrim to stay legible.**
-  It is pale green (`#D5DCC1`, relative luminance 0.69) and sits at 50% height,
-  where the original top-down gradient has already faded to nothing. Measured
-  against the video's bright shopfront wall it came out at **1.0:1** — the
-  site's only navigation disappearing outright on some frames. A full-width
-  band across 42–58% of the frame brings it to 5.1:1 on mobile and 5.6:1 on
-  desktop, past the 4.5:1 AAA threshold for text this size.
+- **The exhibition link on the landing page has no reliable contrast.** It is
+  pale green (`#D5DCC1`, relative luminance 0.69) sitting at 50% height, where
+  the scrim's top-down gradient has already faded to nothing. Measured against
+  the video behind it, the worst case is **1.05:1 on mobile and 1.13:1 on
+  desktop** — far below the 3:1 that text this size needs, and low enough that
+  the site's only navigation disappears entirely on some frames.
 
-  A band is used rather than a pool around the text because `radial-gradient`
-  sizes to its box's farthest corner, so it is still ~40% opaque where the box
-  ends and draws a visible rectangle over the video. Banding vertically has no
-  edge to show, and the link is centred at every viewport.
+  A full-width band across 42–58% of the frame was added for this and reached
+  5.1:1 / 5.6:1, then removed by request because it read as a shadow over the
+  video. This is a known trade in favour of the image, not an oversight. If it
+  is ever revisited, that band is the fix — restore it on `.hero__scrim` in
+  `src/css/landing.css`. (A radial pool around the text was tried first and
+  rejected: `radial-gradient` sizes to its box's farthest corner, so it stays
+  ~40% opaque at the box edge and draws a visible rectangle over the video.)
 
   Measured by compositing the scrim over 17 frames sampled across the video,
   mapping the link's real bounding box through `object-fit: cover`, and taking
-  the worst pixel. **Re-measure if the video is replaced** — a brighter clip
-  pushes this straight back down, and it looks fine by eye long after it stops
-  passing.
+  the worst pixel. Re-measure if the video is replaced — a darker clip would
+  improve this on its own.
 - Body copy on the exhibition page sits over the burgundy ground and the rugs,
   not over video, so it is not subject to the above.

@@ -31,34 +31,20 @@ body { background: #000; }
 
 .hero__video.is-playing { opacity: 1; }
 
-/* Two washes. The top one is the original, carrying the ring text where it
-   crosses the bright sky. The centre band is not decorative: the exhibition
-   link is pale green (#D5DCC1, luminance 0.69) sitting at 50% height, where
-   the top wash has already faded to nothing — measured against the video's
-   bright shopfront wall it came out at 1.0:1, the site's only navigation
-   disappearing outright on some frames. A full-width band is used rather than
-   a pool around the text because a radial gradient sizes to its box's farthest
-   corner, so it is still ~40% opaque where the box ends and draws a visible
-   rectangle over the video. Banding vertically has no edge to show, and the
-   link is centred at every viewport, so 42–58% covers it on any screen.
-   Re-measure if the video is replaced. */
+/* The original wash along the top, carrying the ring text where it crosses the
+   bright sky. It has faded to nothing by 45%, so it does not reach the link at
+   50% — a band was added there for contrast and then removed by request; the
+   link's legibility now rides entirely on whatever the video is doing behind
+   it. See README → Performance for the measurement. */
 .hero__scrim {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0) 30%,
-      rgba(0, 0, 0, 0.60) 42%,
-      rgba(0, 0, 0, 0.60) 58%,
-      rgba(0, 0, 0, 0) 72%
-    ),
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.55) 0%,
-      rgba(0, 0, 0, 0.15) 25%,
-      rgba(0, 0, 0, 0) 45%
-    );
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.15) 25%,
+    rgba(0, 0, 0, 0) 45%
+  );
   pointer-events: none;
 }
 
@@ -100,31 +86,36 @@ body { background: #000; }
   font-family: "Arial Black", "Helvetica Neue", Arial, sans-serif;
 }
 
+/* The label is not part of the link — only the exhibition's name is, so the
+   underline marks exactly what is clickable and nothing more. */
+.hero__label {
+  margin: 0;
+  font-size: clamp(1.1rem, 5.5vw, 1.6rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  opacity: 0.9;
+}
+
 .hero__link {
   display: inline-block;
-  padding: 0.4em 0.6em;      /* a real tap target, not just the glyphs */
+  padding: 0.1em 0.6em 0.35em;   /* a real tap target, not just the glyphs */
   color: inherit;
   font-size: clamp(1.1rem, 5.5vw, 1.6rem);
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1.25;
   opacity: 0.9;
-  transition: opacity 200ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.hero__link-name {
   text-decoration: underline;
   text-decoration-thickness: 0.06em;
   text-underline-offset: 0.22em;
   text-decoration-color: rgba(213, 220, 193, 0.5);
-  transition: text-decoration-color 200ms ease;
+  transition: opacity 200ms ease, text-decoration-color 200ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (hover: hover) {
-  .hero__link:hover { opacity: 1; }
-  .hero__link-name { text-decoration-color: currentColor; }
-  .hero__link:hover .hero__link-name { text-decoration-color: currentColor; }
+  .hero__link:hover { opacity: 1; text-decoration-color: currentColor; }
 }
 
 @media (min-width: 700px) {
