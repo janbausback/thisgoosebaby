@@ -1,0 +1,88 @@
+/* Exhibition page (`/zwischentoene.html`) and the legal pages — the woven
+   ground, the drifting rugs, and the column the menu sits in. */
+
+:root { --bg: #37161d; }
+
+/* Flat colour paints on the first frame; the texture arrives on top.
+   --bg-image is written into the inline block by scripts/build-html.mjs, so
+   the right width is chosen without a second stylesheet round-trip. */
+body {
+  background: var(--bg) var(--bg-image, none) center / cover no-repeat fixed;
+}
+
+/* iOS Safari cannot composite `background-attachment: fixed` cheaply; a scrolling
+   cover background on a short page is visually identical and far lighter. */
+@supports (-webkit-touch-callout: none) {
+  body { background-attachment: scroll; }
+}
+
+.mark {
+  position: fixed;
+  top: var(--pad);
+  left: var(--pad);
+  z-index: 5;
+  width: clamp(7.5rem, 20vw, 13rem);
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.mark svg { width: 100%; height: auto; }
+
+.floaters {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.floater {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--w);
+  height: auto;
+  opacity: var(--o, 0.55);
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+  will-change: transform;
+  /* Positioned by JS before the first paint. */
+  visibility: hidden;
+}
+
+.floater[data-ready] { visibility: visible; }
+.floater[data-dragging] { cursor: grabbing; }
+
+.shell {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding: calc(var(--pad) * 2 + 3.5rem) var(--pad) var(--pad);
+  /* The shell spans the whole viewport above the rugs, so left as-is it would
+     swallow every pointer event before one could reach them. Only the actual
+     controls take input; the empty space between them stays transparent. */
+  pointer-events: none;
+}
+
+.shell :is(button, a, .panel-body, .intro) { pointer-events: auto; }
+
+.shell > nav {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Stand-in for the Zwischentöne mark until the SVG is supplied. Matches the
+   size and colour the SVG will take, so the composition does not shift. */
+.mark-fallback {
+  display: block;
+  font-size: clamp(1.35rem, 3.6vw, 2.3rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}

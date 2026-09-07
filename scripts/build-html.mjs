@@ -3,10 +3,15 @@
  * Renders src/*.html into public/ — inlining the critical CSS and the SVGs,
  * and resolving every /assets/* URL to its content-hashed filename so the
  * whole directory can be served immutable.
+ *
+ * Two screens, two shapes of page. `/` is the landing: the shopfront video and
+ * the ring of studio text, with one link onward. `/zwischentoene.html` is the
+ * exhibition: the drifting rugs and the menu. They share the type stack and
+ * almost nothing else, so each gets its own inline critical block.
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { SRC, PUBLIC, ASSETS, writeHashed, readManifest, mergeManifest, kb } from './lib/manifest.mjs';
+import { SRC, PUBLIC, writeHashed, readManifest, mergeManifest, kb } from './lib/manifest.mjs';
 
 const manifest = readManifest();
 const warnings = [];
@@ -65,12 +70,8 @@ if (wordmarkFile) {
 if (zwischenFile) {
   svgs.zwischentoene = cleanSvg(fs.readFileSync(zwischenFile, 'utf8'));
 } else {
-  // PLACEHOLDER — replaced automatically once Zwischentöne_vector.svg is added
-  // to src/assets and `npm run build` is re-run.
-  warnings.push(
-    'Zwischentöne_vector.svg not found in src/assets — the top-left mark is\n' +
-    '  rendering as live text. Drop the SVG in and re-run `npm run build`.'
-  );
+  warnings.push('Zwischentöne_vector.svg not found in src/assets — the top-left mark is\n' +
+    '  rendering as live text. Drop the SVG in and re-run `npm run build`.');
   svgs.zwischentoene =
     '<span class="mark-fallback" data-placeholder="Zwischentöne_vector.svg">Zwischentöne</span>';
 }
@@ -100,103 +101,144 @@ const squish = (css) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-const critical = squish(fs.readFileSync(path.join(SRC, 'css', 'critical.css'), 'utf8'));
+const readCss = (f) => squish(fs.readFileSync(path.join(SRC, 'css', f), 'utf8'));
 
 const ogUrl = manifest.og?.src ?? '/assets/og-image.jpg';
 
-const mainCss = writeHashed('main', 'css', Buffer.from(squish(fs.readFileSync(path.join(SRC, 'css', 'main.css'), 'utf8'))));
-const mainJs = writeHashed('main', 'js', fs.readFileSync(path.join(SRC, 'js', 'main.js')));
+// The woven background, chosen by width in the inline block so no second
+// stylesheet round-trip is needed to know which file to fetch.
+const bgCss = manifest.bg
+  ? [
+      `:root{--bg-image:url("${manifest.bg.widths[480]}")}`,
+      `@media (min-width:481px),(min-resolution:1.5dppx){:root{--bg-image:url("${manifest.bg.widths[960]}")}}`,
+      `@media (min-width:1441px) and (min-resolution:1.5dppx){:root{--bg-image:url("${manifest.bg.widths[1440]}")}}`,
+    ].join('')
+  : ':root{--bg-image:none}';
+
+const base = readCss('critical.css');
+const CRITICAL = {
+  'index.html': base + readCss('landing.css'),
+  'zwischentoene.html': base + readCss('site.css') + bgCss,
+  'imprint.html': base + readCss('site.css') + bgCss,
+  'privacy.html': base + readCss('site.css') + bgCss,
+};
+
+const mainCss = writeHashed('main', 'css', Buffer.from(readCss('main.css')));
+
+// Every script in src/js is hashed and exposed as {{js:<basename>}}, so a page
+// pulls in only the behaviour it actually has.
+const js = {};
+for (const f of fs.readdirSync(path.join(SRC, 'js')).sort()) {
+  if (!f.endsWith('.js')) continue;
+  js[f.replace(/\.js$/, '')] = writeHashed(f.replace(/\.js$/, ''), 'js', fs.readFileSync(path.join(SRC, 'js', f)));
+}
 
 /* ── JSON-LD ────────────────────────────────────────────────────────────── */
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   .map((d) => `https://schema.org/${d}`);
 
-const jsonld = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'WebSite',
-      '@id': 'https://kolchinagordon.com/#website',
-      url: 'https://kolchinagordon.com/',
-      name: 'Studio Kolchina & Gordon',
-      inLanguage: 'en',
-      publisher: { '@id': 'https://kolchinagordon.com/#organization' },
+const organization = {
+  '@type': 'Organization',
+  '@id': 'https://kolchinagordon.com/#organization',
+  name: 'Studio Kolchina & Gordon',
+  url: 'https://kolchinagordon.com/',
+  email: 'hello@kolchinagordon.com',
+  telephone: '+4915221465761',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Eisenbahnstraße 5',
+    postalCode: '10997',
+    addressLocality: 'Berlin',
+    addressCountry: 'DE',
+  },
+};
+
+const exhibition = {
+  '@type': 'ExhibitionEvent',
+  '@id': 'https://kolchinagordon.com/#exhibition',
+  name: 'Zwischentöne',
+  description:
+    'A temporary installation by Clara Twele and Galina Kolchina at the intersection of design, art and architecture. Open Monday to Saturday, 14:00–20:00. Closed Sundays.',
+  startDate: '2026-09-09T14:00:00+02:00',
+  endDate: '2026-09-30T20:00:00+02:00',
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventSchedule: {
+    '@type': 'Schedule',
+    startDate: '2026-09-09',
+    endDate: '2026-09-30',
+    startTime: '14:00:00',
+    endTime: '20:00:00',
+    byDay: DAYS,
+    repeatFrequency: 'P1W',
+    scheduleTimezone: 'Europe/Berlin',
+  },
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  inLanguage: 'en',
+  isAccessibleForFree: true,
+  image: [`https://kolchinagordon.com${ogUrl}`],
+  url: 'https://kolchinagordon.com/zwischentoene.html',
+  location: {
+    '@type': 'Place',
+    name: 'Eisenbahnstraße 5',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Eisenbahnstraße 5',
+      postalCode: '10997',
+      addressLocality: 'Berlin',
+      addressRegion: 'Berlin',
+      addressCountry: 'DE',
     },
-    {
-      '@type': 'Organization',
-      '@id': 'https://kolchinagordon.com/#organization',
-      name: 'Studio Kolchina & Gordon',
-      url: 'https://kolchinagordon.com/',
-      email: 'hello@kolchinagordon.com',
-      telephone: '+4915221465761',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Eisenbahnstraße 5',
-        postalCode: '10997',
-        addressLocality: 'Berlin',
-        addressCountry: 'DE',
-      },
-    },
-    {
-      '@type': 'ExhibitionEvent',
-      '@id': 'https://kolchinagordon.com/#exhibition',
-      name: 'Zwischentöne',
-      description:
-        'A temporary installation by Clara Twele and Galina Kolchina at the intersection of design, art and architecture. Open Monday to Saturday, 14:00–20:00. Closed Sundays.',
-      startDate: '2026-09-09T14:00:00+02:00',
-      endDate: '2026-09-30T20:00:00+02:00',
-      eventStatus: 'https://schema.org/EventScheduled',
-      eventSchedule: {
-        '@type': 'Schedule',
-        startDate: '2026-09-09',
-        endDate: '2026-09-30',
-        startTime: '14:00:00',
-        endTime: '20:00:00',
-        byDay: DAYS,
-        repeatFrequency: 'P1W',
-        scheduleTimezone: 'Europe/Berlin',
-      },
-      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-      inLanguage: 'en',
-      isAccessibleForFree: true,
-      image: [`https://kolchinagordon.com${ogUrl}`],
-      url: 'https://kolchinagordon.com/',
-      location: {
-        '@type': 'Place',
-        name: 'Eisenbahnstraße 5',
-        address: {
-          '@type': 'PostalAddress',
-          streetAddress: 'Eisenbahnstraße 5',
-          postalCode: '10997',
-          addressLocality: 'Berlin',
-          addressRegion: 'Berlin',
-          addressCountry: 'DE',
-        },
-      },
-      organizer: { '@id': 'https://kolchinagordon.com/#organization' },
-      performer: [
-        { '@type': 'Person', name: 'Clara Twele' },
-        { '@type': 'Person', name: 'Galina Kolchina' },
-      ],
-    },
+  },
+  organizer: { '@id': 'https://kolchinagordon.com/#organization' },
+  performer: [
+    { '@type': 'Person', name: 'Clara Twele' },
+    { '@type': 'Person', name: 'Galina Kolchina' },
   ],
+};
+
+const JSONLD = {
+  'index.html': {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': 'https://kolchinagordon.com/#website',
+        url: 'https://kolchinagordon.com/',
+        name: 'Studio Kolchina & Gordon',
+        inLanguage: 'en',
+        publisher: { '@id': 'https://kolchinagordon.com/#organization' },
+      },
+      organization,
+    ],
+  },
+  'zwischentoene.html': { '@context': 'https://schema.org', '@graph': [exhibition, organization] },
 };
 
 /* ── Token replacement ────────────────────────────────────────────────────── */
 
-function render(html) {
+function render(html, page) {
   return html.replace(/\{\{([a-z]+):?([a-zA-Z0-9_-]*)\}\}/g, (whole, kind, name) => {
     switch (kind) {
-      case 'critical': return critical;
+      case 'critical': {
+        const css = CRITICAL[page];
+        if (!css) { warnings.push(`no critical CSS mapped for ${page}`); return ''; }
+        return css;
+      }
       case 'css': return mainCss.url;
-      case 'js': return mainJs.url;
+      case 'js': {
+        if (!js[name]) { warnings.push(`unknown script: ${whole} in ${page}`); return ''; }
+        return js[name].url;
+      }
       case 'svg': {
         if (!svgs[name]) { warnings.push(`unknown svg token: ${whole}`); return ''; }
         return svgs[name];
       }
       case 'og': return ogUrl;
-      case 'jsonld': return JSON.stringify(jsonld);
+      case 'jsonld': {
+        if (!JSONLD[page]) { warnings.push(`no JSON-LD mapped for ${page}`); return '{}'; }
+        return JSON.stringify(JSONLD[page]);
+      }
       case 'src': case 'srcset': case 'w': case 'h': {
         const a = manifest[name];
         if (!a) { warnings.push(`missing asset in manifest: ${name}`); return ''; }
@@ -208,23 +250,33 @@ function render(html) {
 }
 
 fs.mkdirSync(PUBLIC, { recursive: true });
-for (const page of ['index.html', 'imprint.html', 'privacy.html']) {
-  const out = render(fs.readFileSync(path.join(SRC, page), 'utf8'));
+for (const page of ['index.html', 'zwischentoene.html', 'imprint.html', 'privacy.html']) {
+  const out = render(fs.readFileSync(path.join(SRC, page), 'utf8'), page);
   fs.writeFileSync(path.join(PUBLIC, page), out);
-  console.log(`  ${page.padEnd(16)} ${kb(Buffer.byteLength(out))}`);
+  console.log(`  ${page.padEnd(22)} ${kb(Buffer.byteLength(out))}`);
 }
 
 for (const f of ['robots.txt', 'sitemap.xml', 'site.webmanifest']) {
   const p = path.join(SRC, f);
   if (!fs.existsSync(p)) continue;
-  fs.writeFileSync(path.join(PUBLIC, f), render(fs.readFileSync(p, 'utf8')));
-  console.log(`  ${f.padEnd(16)} copied`);
+  fs.writeFileSync(path.join(PUBLIC, f), render(fs.readFileSync(p, 'utf8'), f));
+  console.log(`  ${f.padEnd(22)} copied`);
 }
 
-mergeManifest({ css: { src: mainCss.url }, js: { src: mainJs.url } });
+mergeManifest({
+  css: { src: mainCss.url },
+  // The single `js` entry became one per script. Clearing the old key stops
+  // prune() from treating its orphaned file as still referenced — JSON.stringify
+  // drops undefined, so this removes the key rather than nulling it.
+  js: undefined,
+  ...Object.fromEntries(Object.entries(js).map(([n, o]) => [`js_${n}`, { src: o.url }])),
+});
 
-console.log(`  ${'main.css'.padEnd(16)} ${kb(mainCss.bytes)}\n  ${'main.js'.padEnd(16)} ${kb(mainJs.bytes)}`);
-console.log(`  ${'critical (inline)'.padEnd(16)} ${kb(Buffer.byteLength(critical))}`);
+console.log(`  ${'main.css'.padEnd(22)} ${kb(mainCss.bytes)}`);
+for (const [n, o] of Object.entries(js)) console.log(`  ${`${n}.js`.padEnd(22)} ${kb(o.bytes)}`);
+for (const [p, c] of Object.entries(CRITICAL)) {
+  console.log(`  ${`critical → ${p}`.padEnd(22)} ${kb(Buffer.byteLength(c))}`);
+}
 
 if (warnings.length) {
   console.warn('\n⚠  ' + warnings.join('\n⚠  '));

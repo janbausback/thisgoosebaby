@@ -3,25 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zwischentöne — Clara Twele &amp; Galina Kolchina | Studio Kolchina &amp; Gordon</title>
-<meta name="description" content="Zwischentöne: a temporary installation by Clara Twele and Galina Kolchina at the intersection of design, art and architecture. 9–30 September 2026, Mon–Sat 14–20h, Eisenbahnstraße 5, Berlin-Kreuzberg.">
+<title>Studio Kolchina &amp; Gordon</title>
+<meta name="description" content="Studio Kolchina &amp; Gordon — an art studio and collaborative project in Berlin, working at the intersection of art, design and science. Currently showing Zwischentöne, Eisenbahnstraße 5, Berlin-Kreuzberg.">
 <link rel="canonical" href="https://kolchinagordon.com/">
 <meta name="robots" content="index, follow, max-image-preview:large">
-<meta name="theme-color" content="#37161d">
+<meta name="theme-color" content="#000000">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Studio Kolchina &amp; Gordon">
 <meta property="og:locale" content="en_GB">
 <meta property="og:url" content="https://kolchinagordon.com/">
-<meta property="og:title" content="Zwischentöne — Clara Twele &amp; Galina Kolchina">
-<meta property="og:description" content="A temporary installation at the intersection of design, art and architecture. 9–30 September 2026, Mon–Sat 14–20h, Eisenbahnstraße 5, Berlin-Kreuzberg.">
+<meta property="og:title" content="Studio Kolchina &amp; Gordon">
+<meta property="og:description" content="An art studio and collaborative project in Berlin. Currently showing Zwischentöne, Eisenbahnstraße 5, Berlin-Kreuzberg.">
 <meta property="og:image" content="https://kolchinagordon.com{{og:image}}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="The Studio Kolchina &amp; Gordon wordmark in white on blue, over a deep burgundy background.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Zwischentöne — Clara Twele &amp; Galina Kolchina">
-<meta name="twitter:description" content="A temporary installation at the intersection of design, art and architecture. 9–30 September 2026, Berlin-Kreuzberg.">
+<meta name="twitter:title" content="Studio Kolchina &amp; Gordon">
+<meta name="twitter:description" content="An art studio and collaborative project in Berlin. Currently showing Zwischentöne.">
 <meta name="twitter:image" content="https://kolchinagordon.com{{og:image}}">
 
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -33,118 +33,61 @@
 
 <style>{{critical}}</style>
 
-<noscript><style>#loader{display:none}.shell,.mark,.hero,.hero-video{opacity:1}</style></noscript>
-<link rel="stylesheet" href="{{css:main}}" media="print" onload="this.media='all';this.onload=null">
-<noscript><link rel="stylesheet" href="{{css:main}}"></noscript>
-<script src="{{js:main}}" defer></script>
+<script src="{{js:marquee}}" defer></script>
+<script src="{{js:landing}}" defer></script>
 
 <script type="application/ld+json">{{jsonld}}</script>
 </head>
 
-<body data-phase="loading">
+<body>
 
-<!-- Loading screen: 1.5s, every visit, nothing remembered between them. -->
-<div id="loader" role="status" aria-label="Loading">
-  <div class="loader-mark">
-    <div class="loader-wordmark">{{svg:wordmark}}</div>
-  </div>
-</div>
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <!--
+    Hand-printed look for the animated ring text. feTurbulence is swapped for a
+    pre-baked feImage texture (written by marquee.js): Safari recomputes
+    feTurbulence's Perlin noise from scratch on every paint even though a fixed
+    seed makes its output identical every time — that's the actual cost behind
+    the ring's stutter, not the displacement/blur/alpha steps. Baking it once
+    per layout and sampling a bitmap instead removes that redundant work.
+  -->
+  <filter id="handPrintedRing" x="0" y="0" width="0" height="0" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse">
+    <feImage id="ringNoise" result="noise" x="0" y="0" width="0" height="0" preserveAspectRatio="none" />
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1" xChannelSelector="R" yChannelSelector="G" result="scattered" />
+    <feGaussianBlur in="scattered" stdDeviation="0.5" result="softened" />
+    <feComponentTransfer in="softened">
+      <feFuncA type="linear" slope="18" intercept="-7" />
+    </feComponentTransfer>
+  </filter>
+</svg>
 
-<!-- Fixed mark, top left -->
-<a class="mark" href="/" aria-label="Zwischentöne — home">{{svg:zwischentoene}}</a>
-
-<!-- Full-bleed video background. The poster is a plain <img> underneath, not
-     just the <video poster> attribute, so it is on screen from first paint
-     regardless of autoplay — JS fades the video in once it is truly playing. -->
-<div class="hero" aria-hidden="true">
-  <img class="hero-poster" src="{{src:poster}}" srcset="{{srcset:poster}}"
+<main class="hero">
+  <!-- The poster is a plain <img> underneath, not just the <video poster>
+       attribute, so it is on screen from first paint regardless of autoplay —
+       JS fades the video in once it is truly playing. -->
+  <img class="hero__poster" src="{{src:poster}}" srcset="{{srcset:poster}}"
        sizes="100vw" width="{{w:poster}}" height="{{h:poster}}" alt=""
-       fetchpriority="high" decoding="sync">
-  <video class="hero-video" src="{{src:video}}" poster="{{src:poster}}"
+       aria-hidden="true" fetchpriority="high" decoding="sync">
+  <video class="hero__video" src="{{src:video}}" poster="{{src:poster}}"
          autoplay muted loop playsinline></video>
-  <div class="hero-scrim"></div>
-</div>
 
-<div class="shell">
-  <h1 class="visually-hidden">Zwischentöne — a temporary installation by Clara Twele and Galina Kolchina</h1>
+  <div class="hero__scrim"></div>
 
-  <div class="intro">
-    <p>A temporary installation by Clara Twele and Galina Kolchina, at the intersection of design, art, and architecture - held together by a soundscape.</p>
-    <p>Every space pauses before it becomes something. Zwischentöne is that pause. A threshold between the visible and the fleeting, between inside and outside, between matter, sound, and imagination.</p>
-    <p>With each step, distance shifts. Perception shifts. Surfaces appear, then disappear again.</p>
-    <p>All objects shown can be purchased.</p>
+  <h1 class="visually-hidden">Studio Kolchina &amp; Gordon</h1>
+
+  <svg class="hero-marquee" aria-hidden="true" focusable="false">
+    <defs>
+      <path id="framePath"></path>
+    </defs>
+    <text id="frameMeasure" class="hero-marquee__text hero-marquee__measure"></text>
+    <text class="hero-marquee__text">
+      <textPath id="frameTextPath" xlink:href="#framePath" href="#framePath" startOffset="0%"></textPath>
+    </text>
+  </svg>
+
+  <div class="hero__footer">
+    <a class="hero__link" href="/zwischentoene.html">Current exhibition: Zwischentöne</a>
   </div>
-
-  <nav aria-label="Main">
-    <ul class="menu">
-      <li>
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="panel-studio">The Studio</button>
-        <div class="panel" id="panel-studio">
-          <div class="panel-inner">
-            <div class="panel-body">
-              <p>Studio Kolchina &amp; Gordon is an art studio and collaborative project based in Berlin, working at the intersection of art, design, and science. Built around the ongoing partnership between visual artist and curator Galina Kolchina and composer and musician Liam Gordon, the studio brings together brands and artists who share a common vision and sensibility.</p>
-              <p>The studio operates as a place of encounter: a rotating programme of artists and brands.</p>
-            </div>
-          </div>
-        </div>
-      </li>
-      <li>
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="panel-artists">Artists</button>
-        <div class="panel" id="panel-artists">
-          <div class="panel-inner">
-            <div class="panel-body">
-              <ul>
-                <li>Dominik Cosentino</li>
-                <li>Liam Gordon</li>
-                <li>Lisa Tiemann</li>
-                <li>Max Rödel</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </li>
-      <li>
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="panel-brands">Brands</button>
-        <div class="panel" id="panel-brands">
-          <div class="panel-inner">
-            <div class="panel-body">
-              <ul>
-                <li>Analog</li>
-                <li>Bemelmans</li>
-                <li>Lehni</li>
-                <li>Reuber Henning</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </li>
-      <li>
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="panel-contact">Contact</button>
-        <div class="panel" id="panel-contact">
-          <div class="panel-inner">
-            <div class="panel-body">
-              <div class="contact">
-                <p>General inquiries: <a href="mailto:hello@kolchinagordon.com">hello@kolchinagordon.com</a></p>
-                <a class="social" href="https://www.instagram.com/_kolchina_/" target="_blank" rel="noopener noreferrer">
-                  {{svg:instagram}}<span>Galina Kolchina<span class="visually-hidden"> on Instagram</span></span>
-                </a>
-                <a class="social" href="https://www.instagram.com/buendel_space/" target="_blank" rel="noopener noreferrer">
-                  {{svg:instagram}}<span>Clara Twele<span class="visually-hidden"> on Instagram</span></span>
-                </a>
-                <p>Graphics and Website by <a href="https://lightweightweb.de">LIGHTWEIGHT</a></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </li>
-    </ul>
-  </nav>
-
-  <footer class="site-footer">
-    <a href="/imprint.html">Imprint</a>
-    <a href="/privacy.html">Privacy Policy</a>
-  </footer>
-</div>
+</main>
 
 </body>
 </html>

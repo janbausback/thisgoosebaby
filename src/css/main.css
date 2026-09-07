@@ -1,5 +1,5 @@
 /* Deferred stylesheet: the menu, its panels, the footer and the legal pages.
-   None of it is needed to paint the loading screen. */
+   None of it is needed for the first paint. */
 
 /* ── Intro ──────────────────────────────────────────────────────────────── */
 /* Always visible — the text that used to live behind the About toggle. */
@@ -50,7 +50,7 @@
   color: var(--fg);
   text-align: left;
   cursor: pointer;
-  /* Keeps white type legible against the video behind it. */
+  /* Keeps white type legible where a drifting rug passes behind it. */
   text-shadow: 0 1px 24px rgba(28, 8, 12, 0.55);
   transition: opacity 220ms ease;
   -webkit-tap-highlight-color: transparent;

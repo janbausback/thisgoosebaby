@@ -11,9 +11,6 @@
   "css": {
     "src": "/assets/main.cd316cfe.css"
   },
-  "js": {
-    "src": "/assets/main.8d048688.js"
-  },
   "og": {
     "src": "/assets/og-image.1c05c8b8.jpg",
     "w": 1200,
@@ -32,5 +29,55 @@
   },
   "video": {
     "src": "/assets/hero.d7daaa82.mp4"
+  },
+  "bg": {
+    "widths": {
+      "480": "/assets/bg-480.3983d471.webp",
+      "960": "/assets/bg-960.7cdf46e3.webp",
+      "1440": "/assets/bg-1440.aab4de95.webp"
+    },
+    "srcset": "/assets/bg-480.3983d471.webp 480w, /assets/bg-960.7cdf46e3.webp 960w, /assets/bg-1440.aab4de95.webp 1440w",
+    "w": 1440,
+    "h": 2030,
+    "src": "/assets/bg-1440.aab4de95.webp"
+  },
+  "teppich1": {
+    "widths": {
+      "480": "/assets/teppich1-480.9d12e29f.webp",
+      "960": "/assets/teppich1-960.dc986694.webp"
+    },
+    "srcset": "/assets/teppich1-480.9d12e29f.webp 480w, /assets/teppich1-960.dc986694.webp 960w",
+    "w": 960,
+    "h": 1406,
+    "src": "/assets/teppich1-960.dc986694.webp"
+  },
+  "teppich2": {
+    "widths": {
+      "480": "/assets/teppich2-480.3e95aa29.webp",
+      "960": "/assets/teppich2-960.2f203679.webp"
+    },
+    "srcset": "/assets/teppich2-480.3e95aa29.webp 480w, /assets/teppich2-960.2f203679.webp 960w",
+    "w": 960,
+    "h": 1330,
+    "src": "/assets/teppich2-960.2f203679.webp"
+  },
+  "teppich3": {
+    "widths": {
+      "480": "/assets/teppich3-480.efe854df.webp",
+      "960": "/assets/teppich3-960.dce8452b.webp"
+    },
+    "srcset": "/assets/teppich3-480.efe854df.webp 480w, /assets/teppich3-960.dce8452b.webp 960w",
+    "w": 960,
+    "h": 1256,
+    "src": "/assets/teppich3-960.dce8452b.webp"
+  },
+  "js_landing": {
+    "src": "/assets/landing.212d220b.js"
+  },
+  "js_main": {
+    "src": "/assets/main.fefdd76d.js"
+  },
+  "js_marquee": {
+    "src": "/assets/marquee.a7749e0c.js"
   }
 }
