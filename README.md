@@ -25,7 +25,7 @@ static server works too — nothing is generated at request time.
 
 ```
 src/            what you edit
-  assets/         original images and SVGs
+  assets/         original images, SVGs, and video/ledder.mp4 (hero background)
   css/            critical.css (inlined into <head>) + main.css (deferred)
   js/main.js
   index.html      templates — {{tokens}} are filled in at build time
@@ -52,49 +52,65 @@ changing anything in `src/`.
 
 ### Images
 
-`build:images` converts every source raster to WebP at 480 / 960 / 1440 and
-wires the widths into `srcset`. Filenames carry a content hash, which is what
-lets `netlify.toml` serve all of `/assets/*` as `immutable` — replace an image,
-re-run the build, and the URL changes with it. Stale files are pruned
+`build:images` converts the hero poster to responsive WebP at 480 / 960 / 1440
+and wires the widths into `srcset`. Filenames carry a content hash, which is
+what lets `netlify.toml` serve all of `/assets/*` as `immutable` — replace an
+image, re-run the build, and the URL changes with it. Stale files are pruned
 automatically.
 
-Quality is set low on purpose. The rugs and the background are near-flat woven
-fields whose own grain sets the noise floor, so q70 costs roughly 2.3× the bytes
-of q50 for under 1 dB of PSNR. The whole initial view is about 30 KB on mobile.
+### Hero video
 
-### Softened rugs
+The main screen's background is a looping, muted, autoplaying video
+(`src/assets/video/ledder.mp4`), not sharp-processed since it isn't a raster —
+`build:images` just content-hashes and copies it. It is re-encoded once by hand
+before being dropped in; there's no dependency on `ffmpeg` in the build itself,
+only in however the source file was prepared. To replace it:
 
-The drifting rugs carry the reference artwork's Gaussian softener: a blurred
-copy of the layer blended back over the original, Normal mode at 47% opacity —
-the same operation as GIMP's blur dialog with its blending-options opacity.
-`SOFTEN` at the top of the rug section in `scripts/build-images.mjs` is the only
-knob; `sigma: 5` is a slight softening, `10` turns it into a pronounced glow.
+```
+ffmpeg -i SOURCE.mov -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" \
+  -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 28 -preset slow \
+  -an -movflags +faststart src/assets/video/ledder.mp4
+ffmpeg -i src/assets/video/ledder.mp4 -frames:v 1 -q:v 2 src/assets/video/ledder-poster.jpg
+```
 
-It is baked into the WebP at build time rather than applied as a CSS `filter`.
-The rugs drift and are draggable, so a runtime blur would re-rasterise a large
-element every frame — expensive precisely where the budget is tightest. Baked,
-it costs nothing at runtime.
+Three of those flags are load-bearing. Without `+faststart` the `moov` atom
+lands after the payload and nothing plays until the whole file has arrived.
+Anything but `yuv420p` — 4:2:2, 10-bit — and Safari refuses the file outright.
+`-an` drops the audio track, which is dead weight on a muted background loop.
 
-Sigma is a fraction of each file's own width, so the 480w and 960w variants look
-identical once CSS has scaled them to the same size. Each rug is resized to
-leave a transparent margin before blurring, because the feather needs somewhere
-to fade into — blurred against the frame it would be cut off square. The blend
-runs on premultiplied pixels: blurring straight RGBA drags the black of fully
-transparent pixels in under the edge and rings every rug with a dark halo.
+Keep it **portrait**, and regenerate the poster from the new video's first
+frame whenever the video changes. The two are separate files and the build will
+not catch a mismatch, but `.hero-video` and `.hero-poster` are stacked in the
+same box under `object-fit: cover`, so differing framing shows as a jump when
+the video fades in — and is permanent for the reduced-motion case below.
 
-The bytes go both ways. Losing the high-frequency weave detail makes the large
-files compress better — the 960w set went from 35.2 KB to 29.8 KB — while the
-480w set grew from 3.8 KB to 8.8 KB, the feathered alpha gradient costing more
-than the tiny flat originals ever did. High-DPR phones request the 960w set, so
-in practice this made the page slightly lighter, not heavier.
+Resolution is worth spending bytes on: the hero is full-bleed, so a 540×960
+source is upscaled ~3.5× on a desktop viewport and looks soft. 1080×1920 holds
+up at every size. Aim for under ~3 MB, raising `-crf` toward 30–32 if needed.
+
+A plain `<img class="hero-poster">` sits underneath the `<video>` and is what
+actually paints — the LCP candidate — so the frame is never blank while the
+video loads or if autoplay is blocked. `src/js/main.js` fades the video in
+(`.is-playing`) only once the `playing` event actually fires, retries `play()`
+on the first tap/click/key if autoplay was blocked (iOS Low Power Mode and
+similar states block it silently, with no event and no way to detect it in
+advance), and never starts it at all under `prefers-reduced-motion` — the
+poster stays as a static image.
+
+`.hero-scrim` is a burgundy-tinted gradient over the whole frame, holding white
+type off the brightest parts of the video. Its opacity is a deliberate trade
+against contrast — see Performance below before changing it, and re-measure if
+the source video changes.
 
 ### Icons
 
 The Zwischentöne mark is a single-line wordmark at roughly 6.8:1. Squeezed into
-a 32 px favicon it is four pixels tall and unreadable, so `build:icons` cuts the
-icons down to the mark's own leading **Z**, found by scanning the artwork rather
-than redrawn. The comment above `leadingGlyph()` in `scripts/build-icons.mjs`
-records why the three obvious ways of isolating it do not work.
+a 32 px favicon it is four pixels tall and unreadable. `build:icons` used to cut
+the icons down to the mark's own leading **Z**, scanned out of the artwork
+rather than redrawn; that was dropped in favour of a flat `#37161d` tile, which
+reads better at every size a tab or a home screen actually renders and cannot be
+misread at any of them. The icons are now generated as solid squares — no SVG
+rasterisation, no glyph isolation.
 
 ### Social preview image
 
@@ -108,18 +124,9 @@ re-runs `build:html` so the meta tags pick up the new filename. Replace
 ## Replacing assets
 
 Drop the new file into `src/assets/` under the same name and run `npm run build`.
-
-Sources are found by basename, whatever the extension — the rugs have arrived as
-both PNG and WebP.
-
-Two shapes of rug source are handled. A **cutout** carries its own alpha and is
-trimmed to its alpha bounds. A **flat photograph** has no alpha and sits on the
-white studio ground with knotted fringes along two edges; a fixed inset either
-leaves a fringe showing or eats into the pile, so `flatCore()` scores each row
-and column by how much of it matches the rug's dominant colour and keeps the
-contiguous band above 90%. `teppich3web.webp` takes this path. Because it is
-fully opaque it also carries a lower CSS opacity than the two cutouts, so it
-layers in the same register rather than blocking them out.
+For the hero video, re-encode it yourself first (see Hero video above) — the
+build only hashes and copies whatever is in `src/assets/video/ledder.mp4`, it
+does not compress it.
 
 If `Zwischentöne_vector.svg` is ever missing, the build warns, renders the
 top-left mark as live text and falls back to the Studio wordmark for icons.
@@ -152,40 +159,58 @@ Measured on the built site — Moto G4, Slow 4G (1.6 Mbps, 150 ms RTT), 4× CPU:
 
 | | mobile | desktop |
 |---|---|---|
-| requests | 8 | 8 |
-| transfer, Brotli | 44 KB | 44 KB |
-| FCP | 284 ms | — |
-| loading screen fully painted | 580 ms | — |
-| LCP | 2.0 s | — |
+| requests | 6 | 5 |
+| transfer | 1.50 MB | 1.43 MB |
+| LCP | 1.95 s (median of 5) | — |
 
-The transfer budget (500 KB) is met about ten times over. **LCP is not under
-1.5 s, and structurally cannot be**: the loading screen deliberately covers the
-viewport for a fixed 1.5 s, so nothing larger than its own square can paint
-before then, and the drifting rugs are larger. LCP lands as the fade completes.
+**This is well past the original 500 KB / 1.5 s budget, on purpose.** The hero
+video is ~1.3 MB of that transfer by itself — bringing it back was an explicit
+choice to trade the transfer budget for it, made with that cost known, not an
+oversight. Everything else on the page is still light: the poster and the rest
+of the markup/CSS/JS/icons together are under 200 KB.
 
-The two requirements are in direct tension. What a visitor actually experiences
-is the branded screen fully painted at 580 ms. If the metric matters more than
-the hold, the lever is `LOADER_MS` at the top of `src/js/main.js`; making the
-rugs smaller on narrow viewports would also hand the LCP back to the loading
-screen's square.
+LCP is governed by the same structural tension as before: the loading screen
+covers the viewport for a fixed 1.5 s, so nothing behind it can paint before
+then, and the video's poster (the LCP candidate once the loader fades) paints
+right after. The lever, if the hold ever needs to give way to the metric, is
+still `LOADER_MS` at the top of `src/js/main.js`.
+
+If the video's bytes ever need trimming further: it is already `crf 30`;
+pushing higher (this footage tolerated `crf 32` with no visible difference in
+testing) or capping its width below the source's 540px would both cut more,
+at some cost to how sharp it reads on a large desktop screen where `cover`
+scales it up.
 
 ## Notes
 
-- The loading screen runs for a fixed 1.5 s on every visit. Nothing is stored
-  between visits — no cookies, no `localStorage`.
-- `prefers-reduced-motion` skips the loading screen and its fade entirely and
-  leaves the rugs at rest. The durations live at the top of `src/js/main.js`.
-- The menu is About · The Studio · Artists · Brands · Contact, with the two
-  prose panels first and the two lists after. Order is just the source order of
-  the `<li>` elements in `src/index.html`.
+- The loading screen runs for a fixed 1.5 s on every visit, showing only the
+  Studio Kolchina & Gordon wordmark on the flat `--bg` colour — no image. Under
+  `prefers-reduced-motion` it skips straight to the final state, no hold and no
+  fade. Durations live at the top of `src/js/main.js`.
+- The intro text — what used to live behind an "About" toggle — is always
+  visible above the menu now, not a panel. It reads as the page's lead
+  statement; `.intro` in `src/css/main.css` shares its typography with
+  `.panel-body` so the two read as one voice.
+- The menu is The Studio · Artists · Brands · Contact, left-aligned, in the
+  source order of the `<li>` elements in `src/index.html`.
+- Body copy is left-aligned sitewide — the intro, every panel, and the legal
+  pages — at a larger, more editorial scale than the original centred design.
+  `.intro, .panel-body` in `src/css/main.css` is the shared type rule.
 - The exhibition runs 9–30 September 2026, Monday to Saturday 14:00–20:00,
   closed Sundays. The dates, the venue and that schedule appear in the meta
   description and in the `ExhibitionEvent` JSON-LD; changing them means editing
   `src/index.html` and the `jsonld` block in `scripts/build-html.mjs`.
-- The drifting rugs are draggable with a pointer or a finger. Nothing on the
-  site is reachable only by dragging.
-- `.shell` spans the viewport above the rugs, so it is `pointer-events: none`
-  with only the real controls set back to `auto`. Without that, nothing behind
-  the menu can be grabbed at all.
-- White type keeps a worst-case contrast of about 9.5:1 even with all three
-  rugs stacked directly behind the menu, against the 7:1 AAA threshold.
+- **White body copy over the video measures about 3.7:1 worst-case, which is
+  below the 4.5:1 WCAG AA minimum.** This is a known, deliberate trade: the
+  scrim was lightened to `0.65 / 0.50 / 0.55 / 0.65` so more of the video reads
+  through, and the contrast went with it. The menu clears its own bar — at
+  `clamp(1.5rem, 4vw, 2.6rem)` it is large text, judged at 3:1 — but the intro
+  and panel paragraphs do not. Expect it to be hard to read on a phone in
+  daylight.
+
+  Measured by compositing the scrim over 17 frames sampled across the video and
+  taking the brightest point in each. For reference, on this footage:
+  `0.70 / 0.56 / 0.61 / 0.70` gives 4.5:1 (AA) and `0.79 / 0.69 / 0.73 / 0.79`
+  gives 7:1 (AAA). Re-measure if the source video changes — a brighter clip
+  pushes this further down, and it looks fine by eye long after it stops
+  passing.

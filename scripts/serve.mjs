@@ -20,6 +20,8 @@ const TYPES = {
   '.ico': 'image/x-icon',
   '.xml': 'application/xml; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
 };
 
 export function createServer() {
@@ -36,10 +38,35 @@ export function createServer() {
       res.writeHead(404, { 'Content-Type': 'text/plain' }).end('Not found');
       return;
     }
-    res.writeHead(200, {
-      'Content-Type': TYPES[path.extname(file)] ?? 'application/octet-stream',
+
+    const type = TYPES[path.extname(file)] ?? 'application/octet-stream';
+    const size = fs.statSync(file).size;
+    const head = {
+      'Content-Type': type,
       'Cache-Control': 'no-store',
-    });
+      'Accept-Ranges': 'bytes',
+    };
+
+    // Safari will not play a video the server cannot serve in pieces: it opens
+    // with a Range request and treats a plain 200 as an unsupported source.
+    const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range ?? '');
+    if (range) {
+      const start = range[1] ? Number(range[1]) : size - Number(range[2]);
+      const end = range[1] && range[2] ? Number(range[2]) : size - 1;
+      if (!(start >= 0 && end < size && start <= end)) {
+        res.writeHead(416, { 'Content-Range': `bytes */${size}` }).end();
+        return;
+      }
+      res.writeHead(206, {
+        ...head,
+        'Content-Range': `bytes ${start}-${end}/${size}`,
+        'Content-Length': end - start + 1,
+      });
+      fs.createReadStream(file, { start, end }).pipe(res);
+      return;
+    }
+
+    res.writeHead(200, { ...head, 'Content-Length': size });
     fs.createReadStream(file).pipe(res);
   });
 }

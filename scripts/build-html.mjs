@@ -100,18 +100,7 @@ const squish = (css) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-const bgBlock = manifest.bg
-  ? [
-      `:root{--bg-image:url("${manifest.bg.widths[480]}")}`,
-      `@media (min-width:481px),(min-resolution:1.5dppx){:root{--bg-image:url("${manifest.bg.widths[960]}")}}`,
-      `@media (min-width:1441px) and (min-resolution:1.5dppx){:root{--bg-image:url("${manifest.bg.widths[1440]}")}}`,
-    ].join('')
-  : ':root{--bg-image:none}';
-
-// The background texture is declared in the inlined CSS so it is discovered on
-// the first parse, with no extra round trip and nothing to preload.
-const critical =
-  bgBlock + squish(fs.readFileSync(path.join(SRC, 'css', 'critical.css'), 'utf8'));
+const critical = squish(fs.readFileSync(path.join(SRC, 'css', 'critical.css'), 'utf8'));
 
 const ogUrl = manifest.og?.src ?? '/assets/og-image.jpg';
 

@@ -29,11 +29,11 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 
-<link rel="preload" as="image" href="{{src:square}}" imagesrcset="{{srcset:square}}" imagesizes="(min-width: 848px) 560px, 66vw" fetchpriority="high">
+<link rel="preload" as="image" href="{{src:poster}}" imagesrcset="{{srcset:poster}}" imagesizes="100vw" fetchpriority="high">
 
 <style>{{critical}}</style>
 
-<noscript><style>#loader{display:none}.shell,.mark,.floaters{opacity:1}.floater{visibility:visible}</style></noscript>
+<noscript><style>#loader{display:none}.shell,.mark,.hero,.hero-video{opacity:1}</style></noscript>
 <link rel="stylesheet" href="{{css:main}}" media="print" onload="this.media='all';this.onload=null">
 <noscript><link rel="stylesheet" href="{{css:main}}"></noscript>
 <script src="{{js:main}}" defer></script>
@@ -46,9 +46,6 @@
 <!-- Loading screen: 1.5s, every visit, nothing remembered between them. -->
 <div id="loader" role="status" aria-label="Loading">
   <div class="loader-mark">
-    <img class="loader-square" src="{{src:square}}" srcset="{{srcset:square}}"
-         sizes="(min-width: 848px) 560px, 66vw"
-         width="{{w:square}}" height="{{h:square}}" alt="" fetchpriority="high" decoding="sync">
     <div class="loader-wordmark">{{svg:wordmark}}</div>
   </div>
 </div>
@@ -56,37 +53,30 @@
 <!-- Fixed mark, top left -->
 <a class="mark" href="/" aria-label="Zwischentöne — home">{{svg:zwischentoene}}</a>
 
-<!-- Decorative drifting rugs. Behind the menu, draggable as an enhancement. -->
-<div class="floaters" aria-hidden="true">
-  <img class="floater" style="--w: clamp(15rem, 46vw, 34rem); --o: 1; --o-sm: .8"
-       src="{{src:teppich1}}" srcset="{{srcset:teppich1}}" sizes="(min-width: 1183px) 544px, 46vw"
-       width="{{w:teppich1}}" height="{{h:teppich1}}" alt="" decoding="async" fetchpriority="low">
-  <img class="floater" style="--w: clamp(16rem, 50vw, 38rem); --o: .92; --o-sm: .72"
-       src="{{src:teppich2}}" srcset="{{srcset:teppich2}}" sizes="(min-width: 1216px) 608px, 50vw"
-       width="{{w:teppich2}}" height="{{h:teppich2}}" alt="" decoding="async" fetchpriority="low">
-  <img class="floater" style="--w: clamp(12rem, 37vw, 27rem); --o: .62; --o-sm: .5"
-       src="{{src:teppich3}}" srcset="{{srcset:teppich3}}" sizes="(min-width: 1200px) 480px, 40vw"
-       width="{{w:teppich3}}" height="{{h:teppich3}}" alt="" decoding="async" fetchpriority="low">
+<!-- Full-bleed video background. The poster is a plain <img> underneath, not
+     just the <video poster> attribute, so it is on screen from first paint
+     regardless of autoplay — JS fades the video in once it is truly playing. -->
+<div class="hero" aria-hidden="true">
+  <img class="hero-poster" src="{{src:poster}}" srcset="{{srcset:poster}}"
+       sizes="100vw" width="{{w:poster}}" height="{{h:poster}}" alt=""
+       fetchpriority="high" decoding="sync">
+  <video class="hero-video" src="{{src:video}}" poster="{{src:poster}}"
+         autoplay muted loop playsinline></video>
+  <div class="hero-scrim"></div>
 </div>
 
 <div class="shell">
   <h1 class="visually-hidden">Zwischentöne — a temporary installation by Clara Twele and Galina Kolchina</h1>
 
+  <div class="intro">
+    <p>A temporary installation by Clara Twele and Galina Kolchina, at the intersection of design, art, and architecture - held together by a soundscape.</p>
+    <p>Every space pauses before it becomes something. Zwischentöne is that pause. A threshold between the visible and the fleeting, between inside and outside, between matter, sound, and imagination.</p>
+    <p>With each step, distance shifts. Perception shifts. Surfaces appear, then disappear again.</p>
+    <p>All objects shown can be purchased.</p>
+  </div>
+
   <nav aria-label="Main">
     <ul class="menu">
-      <li>
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="panel-about">About</button>
-        <div class="panel" id="panel-about">
-          <div class="panel-inner">
-            <div class="panel-body">
-              <p>A temporary installation by Clara Twele and Galina Kolchina, at the intersection of design, art, and architecture - held together by a soundscape.</p>
-              <p>Every space pauses before it becomes something. Zwischentöne is that pause. A threshold between the visible and the fleeting, between inside and outside, between matter, sound, and imagination.</p>
-              <p>With each step, distance shifts. Perception shifts. Surfaces appear, then disappear again.</p>
-              <p>All objects shown can be purchased.</p>
-            </div>
-          </div>
-        </div>
-      </li>
       <li>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="panel-studio">The Studio</button>
         <div class="panel" id="panel-studio">
