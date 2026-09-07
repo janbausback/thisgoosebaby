@@ -109,16 +109,22 @@ body { background: #000; }
   letter-spacing: -0.03em;
   line-height: 1.25;
   opacity: 0.9;
+  transition: opacity 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero__link-name {
   text-decoration: underline;
   text-decoration-thickness: 0.06em;
   text-underline-offset: 0.22em;
   text-decoration-color: rgba(213, 220, 193, 0.5);
-  transition: opacity 200ms ease, text-decoration-color 200ms ease;
-  -webkit-tap-highlight-color: transparent;
+  transition: text-decoration-color 200ms ease;
 }
 
 @media (hover: hover) {
-  .hero__link:hover { opacity: 1; text-decoration-color: currentColor; }
+  .hero__link:hover { opacity: 1; }
+  .hero__link-name { text-decoration-color: currentColor; }
+  .hero__link:hover .hero__link-name { text-decoration-color: currentColor; }
 }
 
 @media (min-width: 700px) {
