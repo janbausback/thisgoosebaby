@@ -36,20 +36,36 @@
       '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' +
       '<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.3 0.35" numOctaves="1" seed="7" /></filter>' +
       '<rect width="100%" height="100%" filter="url(#n)" /></svg>';
-    var blob = new Blob([markup], { type: "image/svg+xml;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
+    var url;
+    try {
+      url = URL.createObjectURL(new Blob([markup], { type: "image/svg+xml;charset=utf-8" }));
+    } catch (e) {
+      return; // no texture; the ring stays unfiltered and readable
+    }
     var img = new Image();
     img.onload = function () {
-      var canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      try {
+        var canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        // Throws in WebKit versions that treat a canvas drawn from an SVG blob
+        // as tainted. Everything up to here can succeed and this still fail.
+        var dataUrl = canvas.toDataURL("image/png");
+        ringNoiseEl.setAttributeNS("http://www.w3.org/1999/xlink", "href", dataUrl);
+        ringNoiseEl.setAttribute("href", dataUrl);
+        // Only now is the filter safe to switch on: feImage has something to
+        // sample, so the chain cannot collapse the ring to transparent.
+        svg.setAttribute("data-textured", "");
+      } catch (e) {
+        svg.removeAttribute("data-textured");
+      }
       URL.revokeObjectURL(url);
-      var dataUrl = canvas.toDataURL("image/png");
-      ringNoiseEl.setAttributeNS("http://www.w3.org/1999/xlink", "href", dataUrl);
-      ringNoiseEl.setAttribute("href", dataUrl);
     };
-    img.onerror = function () { URL.revokeObjectURL(url); };
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      svg.removeAttribute("data-textured");
+    };
     img.src = url;
   }
 

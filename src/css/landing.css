@@ -63,6 +63,19 @@ body { background: #000; }
   font-weight: 900;
   font-size: clamp(0.78rem, 3.4vw, 1rem);
   letter-spacing: -0.01em;
+}
+
+/* The hand-printed texture is switched on only after marquee.js confirms the
+   noise bitmap actually baked — it sets data-textured on success.
+
+   This is not belt-and-braces. The filter chain ends in feComponentTransfer
+   with slope 18 / intercept -7, which maps an empty input straight to fully
+   transparent, so any failure earlier in the chain takes the whole ring with
+   it rather than just its texture. The step that fails in practice is
+   canvas.toDataURL() after drawing an SVG blob: some WebKit versions treat
+   that canvas as tainted and throw, which leaves feImage with no href. Gating
+   the filter means a failure costs the texture and keeps the text. */
+.hero-marquee[data-textured] .hero-marquee__text {
   filter: url(#handPrintedRing);
   /* Forces Safari to composite this element on its own layer instead of
      repainting the surrounding stacking context on every filtered frame. */

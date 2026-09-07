@@ -125,6 +125,16 @@ advance). Holding the video transparent until then also keeps WebKit's own "tap
 to play" button — shadow DOM a page is no longer allowed to style away —
 invisible along with the rest of the element.
 
+The ring's hand-printed texture degrades rather than failing closed. Its
+filter chain ends in `feComponentTransfer` with `slope 18 / intercept -7`,
+which maps an empty input straight to fully transparent — so if any earlier
+step fails, the ring disappears entirely instead of merely losing its texture.
+The step that fails in practice is `canvas.toDataURL()` after drawing the noise
+SVG blob, which some WebKit versions refuse on a tainted canvas. `marquee.js`
+therefore bakes the noise first and only then sets `data-textured` on the SVG;
+the CSS applies `filter: url(#handPrintedRing)` under that attribute alone. A
+failure now costs the texture and keeps the text.
+
 Note that neither the video nor the marquee ring stops under
 `prefers-reduced-motion`. That is inherited from this page's original design and
 is recorded as deliberate in the comment above `tick()` in `src/js/marquee.js`:
