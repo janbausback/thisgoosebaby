@@ -106,10 +106,13 @@ body { background: #000; }
 }
 
 /* The label is not part of the link — only the exhibition's name is, so the
-   underline marks exactly what is clickable and nothing more. */
+   underline marks exactly what is clickable and nothing more. Bold, against
+   the link's regular weight, to read as a label rather than a second line of
+   the same sentence. */
 .hero__label {
   margin: 0;
   font-size: clamp(1.1rem, 5.5vw, 1.6rem);
+  font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.25;
   opacity: 0.9;
