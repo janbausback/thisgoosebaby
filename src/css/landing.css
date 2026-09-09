@@ -117,8 +117,7 @@ body { background: #000; }
   background: #efeae1;
   /* One variable drives both rules of the frame, so the keyline below can never
      drift out of step with the border. */
-  --frame: clamp(4px, 1.15vw, 7px);
-  border: var(--frame) solid #37161d;
+  border: clamp(4px, 1.15vw, 7px) solid #37161d;
   border-radius: 2px;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
   text-align: center;
@@ -127,33 +126,25 @@ body { background: #000; }
   font-weight: 400;
 }
 
-/* The inner keyline — the plaque's second rule, set in from the frame. */
-.hero__footer::before {
-  content: "";
-  position: absolute;
-  inset: var(--frame);
-  border: 1px solid #37161d;
-  pointer-events: none;
-}
-
 /* The dates are not part of the link — only the exhibition's name is. Set
-   smaller than the name, so the plaque reads name-first. */
+   smaller than the name, so the plaque reads name-first. Same tight
+   letter-spacing as the mark on the exhibition page. */
 .hero__label {
   margin: 0;
   font-size: clamp(0.9rem, 3.7vw, 1.05rem);
   font-weight: 400;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
   line-height: 1.3;
 }
 
-/* No underline at all — the white card is what marks this out, and the label
-   above it says what the name is. */
+/* No underline at all — the card is what marks this out. Same tight
+   letter-spacing as the mark on the exhibition page. */
 .hero__link {
   display: inline-block;
   padding: 0.05em 0.4em 0.1em;   /* a real tap target, not just the glyphs */
   color: inherit;
   font-size: clamp(1.35rem, 6.4vw, 1.9rem);
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
   line-height: 1.2;
   text-decoration: none;
   transition: opacity 200ms ease;
