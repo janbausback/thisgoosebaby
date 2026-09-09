@@ -9,7 +9,7 @@
     "src": "/assets/icon-512-maskable.bff79252.png"
   },
   "css": {
-    "src": "/assets/main.cd316cfe.css"
+    "src": "/assets/main.5a399d32.css"
   },
   "og": {
     "src": "/assets/og-image.8faca45a.jpg",
@@ -18,17 +18,17 @@
   },
   "poster": {
     "widths": {
-      "480": "/assets/poster-480.c7b8776e.webp",
-      "960": "/assets/poster-960.a8f589e2.webp",
-      "1440": "/assets/poster-1440.d86382bf.webp"
+      "480": "/assets/poster-480.2b85c193.webp",
+      "960": "/assets/poster-960.da241207.webp",
+      "1440": "/assets/poster-1440.f12a5e13.webp"
     },
-    "srcset": "/assets/poster-480.c7b8776e.webp 480w, /assets/poster-960.a8f589e2.webp 960w, /assets/poster-1440.d86382bf.webp 1440w",
+    "srcset": "/assets/poster-480.2b85c193.webp 480w, /assets/poster-960.da241207.webp 960w, /assets/poster-1440.f12a5e13.webp 1440w",
     "w": 1440,
     "h": 2560,
-    "src": "/assets/poster-1440.d86382bf.webp"
+    "src": "/assets/poster-1440.f12a5e13.webp"
   },
   "video": {
-    "src": "/assets/hero.779a408c.mp4"
+    "src": "/assets/hero.a678a739.mp4"
   },
   "bg": {
     "widths": {

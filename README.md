@@ -101,19 +101,27 @@ from the `<video>` in `src/index.html`; it plays once and rests on the final
 open frame. Restore `loop` only if the footage is ever replaced with something
 that actually cycles.
 
-Current cut: `ledder2.MOV` trimmed from 19.2 s (the camera reframes over
-t≈14–19; starting after that keeps the framing locked) to the end, 24.9 s at
-1080×1920 / 30 fps, 2.0 MB.
+Current cut: `ledder2.MOV` trimmed from 26.2 s to the end and run at 1.5×,
+giving 12.0 s at 1080×1920 / 30 fps, 1.0 MB. (The camera reframes over t≈14–19
+in the master, so any start after ~19 s keeps the framing locked.)
+
+The speed-up is baked into the encode rather than set as `playbackRate` on the
+element, and the start is a trim rather than a `currentTime` seek: both keep the
+file smaller — this cut is half the bytes of the untrimmed 1× version — and
+avoid asking the browser to seek a just-loaded stream before it can paint.
 
 To replace it:
 
 ```
 ffmpeg -ss <start> -i SOURCE.MOV \
-  -vf "colorspace=iall=bt2020:itrc=bt2020-10:all=bt709:format=yuv420p,fps=30,scale=1080:1920:flags=lanczos" \
+  -vf "colorspace=iall=bt2020:itrc=bt2020-10:all=bt709:format=yuv420p,setpts=PTS/1.5,fps=30,scale=1080:1920:flags=lanczos" \
   -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 30 -preset slow \
   -an -movflags +faststart src/assets/video/ledder.mp4
 ffmpeg -i src/assets/video/ledder.mp4 -frames:v 1 -q:v 2 src/assets/video/ledder-poster.jpg
 ```
+
+`setpts=PTS/1.5` is the speed change; drop it for 1×. It must come before
+`fps=30` so the frame-rate filter resamples the retimed stream.
 
 Four things in that command are load-bearing:
 
@@ -142,7 +150,8 @@ Resolution is worth spending bytes on: the hero is full-bleed, so a 540×960
 source is upscaled ~3.5× on a desktop viewport and looks soft. 1080×1920 holds
 up at every size. Night footage carries sensor noise and compresses far worse
 than daylight — on this clip `crf 26/30/34` came out at roughly 8.4 / 4.0 / 2.2
-MB for the full 44 s. `crf 30` is the chosen balance.
+MB for the full 44 s. `crf 30` is the chosen balance, and the 12 s cut brings
+the file to 1.0 MB.
 
 The camera master (`ledder2.MOV`, 781 MB) is **not** committed —
 `src/assets/video/*.MOV` is gitignored. Keep it in the project archive; only the
@@ -255,17 +264,17 @@ CSS inlined, measured from the built files in `public/`):
 
 | | requests | transfer |
 |---|---|---|
-| `/` (landing) | 5 | 2.02 MB |
-| `/zwischentoene.html` | 7 | **40 KB** |
+| `/` (landing) | 5 | 1.06 MB |
+| `/zwischentoene.html` | 7 | **41 KB** |
 
 **Splitting the two screens is what makes the exhibition page cheap.** It used
 to carry the video and came in around 1.5 MB; with the video living only on the
 landing page, everything the exhibition needs — markup, critical CSS, the
 deferred stylesheet, the menu and rug script, the woven background and all three
-rugs — adds up to 40 KB.
+rugs — adds up to 41 KB.
 
-The landing page is the expensive one, and it is nearly all video: 2.0 MB of its
-2.02 MB. That is an explicit trade for the full-bleed shopfront, made with the
+The landing page is the expensive one, and it is nearly all video: 1.0 MB of its
+1.06 MB. That is an explicit trade for the full-bleed shopfront, made with the
 cost known — the night footage was budgeted at `crf 30` against measured
 alternatives of ~2.2 MB (`crf 34`, mushy shadows) and ~8.4 MB (`crf 26`).
 Everything else on the page is under 40 KB. The poster is preloaded at
@@ -278,7 +287,7 @@ single-page build with its 1.5 s loading screen, so they no longer describe this
 site and have been dropped rather than carried over. If the number matters,
 re-measure it.
 
-If the video's bytes ever need trimming: it is currently `crf 30` over a 24.9 s
+If the video's bytes ever need trimming: it is currently `crf 30` over a 12.0 s
 cut. Raising the crf, shortening the cut further, or capping its width would all
 help, at some cost to how it reads on a large desktop screen where `cover`
 scales it up — and night footage shows compression artefacts in the shadows
@@ -297,6 +306,21 @@ much sooner than daylight did.
   source order of the `<li>` elements in `src/zwischentoene.html`. Its
   font-size is derived from the mark rather than picked by eye — see the
   comment on `.menu-toggle` in `src/css/main.css`.
+- **The menu is anchored to the top of its area, not centred.** `.shell > nav`
+  used `align-items: center`, which meant an opening panel grew the list in both
+  directions and shifted the whole menu up by 77–86px — the item you had just
+  tapped moved out from under your finger. With `flex-start` the toggles above
+  an open panel never move; only what is below it is pushed down, which is what
+  `scrollIntoView` in `main.js` already assumed.
+- **`.panel-body` is indented rather than relying on vertical space.** The
+  toggles are stacked tightly, so the gap above an open panel can never be
+  smaller than the gap between two closed items — space alone cannot say which
+  toggle the content belongs to. The step in from the left does.
+- The exhibition's opening hours live in two places that must be changed
+  together: the `.hours` block in `src/zwischentoene.html` and the
+  `eventSchedule` array in `scripts/build-html.mjs`. The schedule is two runs —
+  10–13 September daily 14:00–20:00, then 14–30 September Thursday to Saturday
+  15:00–19:00 — so `eventSchedule` is an array, not a single `Schedule`.
 - Body copy is left-aligned sitewide — the intro, every panel, and the legal
   pages — at a larger, more editorial scale than the original centred design.
   `.intro, .panel-body` in `src/css/main.css` is the shared type rule.

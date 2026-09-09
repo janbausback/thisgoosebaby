@@ -135,8 +135,9 @@ for (const f of fs.readdirSync(path.join(SRC, 'js')).sort()) {
 
 /* ── JSON-LD ────────────────────────────────────────────────────────────── */
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  .map((d) => `https://schema.org/${d}`);
+const day = (d) => `https://schema.org/${d}`;
+const ALL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day);
+const THU_SAT = ['Thursday', 'Friday', 'Saturday'].map(day);
 
 const organization = {
   '@type': 'Organization',
@@ -159,20 +160,35 @@ const exhibition = {
   '@id': 'https://kolchinagordon.com/#exhibition',
   name: 'Zwischentöne',
   description:
-    'A temporary installation by Clara Twele and Galina Kolchina at the intersection of design, art and architecture. Open Monday to Saturday, 14:00–20:00. Closed Sundays.',
+    'A temporary installation by Clara Twele and Galina Kolchina at the intersection of design, art and architecture. Open 10–13 September 14:00–20:00, then Thursdays to Saturdays 15:00–19:00 until 30 September.',
   startDate: '2026-09-09T14:00:00+02:00',
-  endDate: '2026-09-30T20:00:00+02:00',
+  endDate: '2026-09-30T19:00:00+02:00',
   eventStatus: 'https://schema.org/EventScheduled',
-  eventSchedule: {
-    '@type': 'Schedule',
-    startDate: '2026-09-09',
-    endDate: '2026-09-30',
-    startTime: '14:00:00',
-    endTime: '20:00:00',
-    byDay: DAYS,
-    repeatFrequency: 'P1W',
-    scheduleTimezone: 'Europe/Berlin',
-  },
+  // Two runs of hours, so this is an array: the opening days are daily and
+  // longer, and the rest of the month is Thursday to Saturday, shorter. Keep
+  // both in step with the .hours block in src/zwischentoene.html.
+  eventSchedule: [
+    {
+      '@type': 'Schedule',
+      startDate: '2026-09-10',
+      endDate: '2026-09-13',
+      startTime: '14:00:00',
+      endTime: '20:00:00',
+      byDay: ALL_DAYS,
+      repeatFrequency: 'P1D',
+      scheduleTimezone: 'Europe/Berlin',
+    },
+    {
+      '@type': 'Schedule',
+      startDate: '2026-09-14',
+      endDate: '2026-09-30',
+      startTime: '15:00:00',
+      endTime: '19:00:00',
+      byDay: THU_SAT,
+      repeatFrequency: 'P1W',
+      scheduleTimezone: 'Europe/Berlin',
+    },
+  ],
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   inLanguage: 'en',
   isAccessibleForFree: true,

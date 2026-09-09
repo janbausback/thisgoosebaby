@@ -70,10 +70,15 @@ body {
 
 .shell :is(button, a, .panel-body, .intro) { pointer-events: auto; }
 
+/* flex-start, not centre. Centring the menu in the leftover space made every
+   panel push the list outward in both directions — opening one moved the whole
+   menu up by 77–86px, sliding the item you just tapped out from under your
+   finger. Anchored to the top, opening a panel only ever pushes what is below
+   it down, and nothing above the toggle moves at all. */
 .shell > nav {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
 }
 

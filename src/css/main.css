@@ -11,6 +11,28 @@
 
 .intro p + p { margin-top: 0.9em; }
 
+/* Opening times. A <dl> because these are term/definition pairs — a span of
+   dates and the hours that apply to it — not prose. */
+.hours { margin: 1.9em 0 0; }
+
+.hours__title {
+  margin: 0 0 0.55em;
+  font-weight: 700;
+}
+
+.hours dl { margin: 0; }
+.hours dt { margin: 0; }
+
+/* The hours sit tight under their dates and a shade quieter, so each pair reads
+   as one unit; the gap only opens up before the next date. Without that the two
+   spans ran together as four evenly-spaced lines. */
+.hours dd {
+  margin: 0.1em 0 0;
+  opacity: 0.78;
+}
+
+.hours dd + dt { margin-top: 0.95em; }
+
 /* ── Menu ───────────────────────────────────────────────────────────────── */
 
 .menu {
@@ -39,7 +61,10 @@
   display: inline-block;
   width: auto;
   margin: 0;
-  padding: 0.08em 0;
+  /* Enough leading that four stacked items read as a list rather than one
+     block, and close enough to the panel's own spacing that opening one is not
+     a jump in density. */
+  padding: 0.2em 0;
   border: 0;
   background: none;
   font: inherit;
@@ -88,10 +113,15 @@
   text-shadow: 0 1px 18px rgba(28, 8, 12, 0.6);
 }
 
+/* Indented, so it is unambiguous which toggle the content belongs to. With the
+   items stacked this tightly, vertical gaps alone cannot carry that — the space
+   above an open panel can never be smaller than the space between two closed
+   items. The step in from the left says it instead, and the extra room below
+   separates the group from the next item. */
 .panel-body {
   max-width: 34rem;
   margin: 0;
-  padding: 0.75rem 0 1.75rem;
+  padding: 0.85rem 0 2.1rem 1.15rem;
 }
 
 .panel-body p { margin: 0; }
