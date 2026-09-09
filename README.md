@@ -45,8 +45,8 @@ Edit files in `src/`, run a build, commit `public/`.
 ### Two screens
 
 `/` is the landing: the shopfront video full-bleed, the studio name running
-around the frame as a marquee ring, and a single link into the current
-exhibition. `/zwischentoene.html` is the exhibition itself: the woven
+around the frame as a marquee ring, and a plaque carrying the run dates and a
+single link into the exhibition. `/zwischentoene.html` is the exhibition itself: the woven
 background, the drifting rugs, and the menu.
 
 They are separate documents rather than one page that swaps state, so the
@@ -305,13 +305,20 @@ much sooner than daylight did.
   description and in the `ExhibitionEvent` JSON-LD; changing them means editing
   `src/zwischentoene.html` and the `exhibition` object in
   `scripts/build-html.mjs`.
-- **The exhibition link sits on a white card, and that is what makes it
+- **The exhibition link sits on a framed plaque, and that is what makes it
   readable.** It is set in the site's burgundy (`#37161d`), which is close to
-  black; the landing video is now a night shot, and no scrim is wanted over it.
+  black; the landing video is a night shot, and no scrim is wanted over it.
   Measured directly against the footage the type came out near 1:1 — invisible.
-  On the white card the same burgundy measures **16.2:1**, comfortably past
-  AAA, and the video behind it is left completely untouched. This is why
-  `.hero__footer` has a background at all; it is not decoration.
+  On the plaque's cream field (`#efeae1`) the same burgundy measures
+  **13.5:1**, comfortably past AAA, and the video behind it is left completely
+  untouched. This is why `.hero__footer` has a background at all; it is not
+  decoration.
+
+  The frame is two rules — a thick border and a keyline set inside it — both
+  driven off one `--frame` custom property, so they cannot drift apart. The
+  plaque sits at `top: 78%`, over the pavement on a portrait phone; on a wide
+  viewport `cover` has already cropped the pavement away and it simply reads as
+  the lower quarter of the picture.
 
   The card is `width: max-content` rather than the default shrink-to-fit,
   because an auto-width absolutely positioned box at `left: 50%` is only
