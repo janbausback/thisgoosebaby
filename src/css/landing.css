@@ -107,15 +107,21 @@ body { background: #000; }
   font-weight: 400;
 }
 
-/* Small and uppercase, so the wordmark leads. Positive tracking here rather
-   than the tight setting used elsewhere on the site — uppercase at this size
-   needs opening up, not closing in. */
+/* Small and uppercase, sitting under the wordmark and ranged right, hung so the
+   line finishes just past the final "e" rather than flush with it — the slight
+   overhang reads as deliberate where an exact alignment would look like a near
+   miss. The negative right margin is what pushes it out; it is in em, so the
+   overhang tracks the date's own size across viewports.
+
+   Positive tracking here rather than the tight setting used elsewhere on the
+   site — uppercase at this size needs opening up, not closing in. */
 .hero__label {
-  margin: 0 0 0.85em;
+  margin: 0.5em -1.15em 0 0;
   font-size: clamp(0.72rem, 2.9vw, 0.9rem);
   letter-spacing: 0.09em;
   text-transform: uppercase;
   line-height: 1.3;
+  text-align: right;
   opacity: 0.92;
   text-shadow: 0 1px 18px rgba(0, 0, 0, 0.9);
 }

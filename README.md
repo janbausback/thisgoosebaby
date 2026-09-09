@@ -45,8 +45,8 @@ Edit files in `src/`, run a build, commit `public/`.
 ### Two screens
 
 `/` is the landing: the shopfront video full-bleed, the studio name running
-around the frame as a marquee ring, and the run dates over the wordmark, which
-is the single link into the exhibition. `/zwischentoene.html` is the exhibition itself: the woven
+around the frame as a marquee ring, and the wordmark — the single link into the
+exhibition — with the run dates hung under it. `/zwischentoene.html` is the exhibition itself: the woven
 background, the drifting rugs, and the menu.
 
 They are separate documents rather than one page that swaps state, so the
@@ -362,6 +362,14 @@ much sooner than daylight did.
   `stroke-width` is in user units, so the outline scales with the letterforms
   rather than thinning out as the viewport grows. The block sits at `top: 78%`,
   which puts it on the paving stones on a portrait phone.
+
+  The dates sit **under** the mark and ranged right, hung past it by a negative
+  right margin so the line finishes just after the final "e" rather than flush
+  with it — a slight overhang reads as deliberate where an exact alignment looks
+  like a near miss. The margin is in `em`, so it tracks the date's own size:
+  16.5px of overhang at every viewport from 500px up, easing down only once the
+  font-size clamp starts to bite. They also follow the link in source order, so
+  the reading order matches the screen.
 
   The SVG is inlined, which takes `index.html` from 7.8 KB to 16.7 KB. That is
   nothing against a 2.1 MB video and it costs no extra request, but it is why
