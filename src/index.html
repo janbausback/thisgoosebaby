@@ -67,8 +67,10 @@
   <img class="hero__poster" src="{{src:poster}}" srcset="{{srcset:poster}}"
        sizes="100vw" width="{{w:poster}}" height="{{h:poster}}" alt=""
        aria-hidden="true" fetchpriority="high" decoding="sync">
+  <!-- No `loop`: the clip is a one-way reveal — the shutter rises to expose the
+       lit interior — so it plays once and rests on the final open frame. -->
   <video class="hero__video" src="{{src:video}}" poster="{{src:poster}}"
-         autoplay muted loop playsinline></video>
+         autoplay muted playsinline></video>
 
   <div class="hero__scrim"></div>
 

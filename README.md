@@ -87,23 +87,50 @@ of q50 for under 1 dB of PSNR.
 
 ### Landing video
 
-The landing page's background is a looping, muted, autoplaying video
+The landing page's background is a muted, autoplaying video
 (`src/assets/video/ledder.mp4`), not sharp-processed since it isn't a raster —
 `build:images` just content-hashes and copies it. It is re-encoded once by hand
 before being dropped in; there's no dependency on `ffmpeg` in the build itself,
-only in however the source file was prepared. To replace it:
+only in however the source file was prepared.
+
+**It does not loop.** The clip is a one-way reveal — a night shot in which the
+shopfront's roller shutter rises to expose the lit interior — so it has no
+natural loop point: it starts closed and ends open, and looping it would snap
+back to a shut shutter every pass. The `loop` attribute is deliberately absent
+from the `<video>` in `src/index.html`; it plays once and rests on the final
+open frame. Restore `loop` only if the footage is ever replaced with something
+that actually cycles.
+
+Current cut: `ledder2.MOV` trimmed from 19.2 s (the camera reframes over
+t≈14–19; starting after that keeps the framing locked) to the end, 24.9 s at
+1080×1920 / 30 fps, 2.0 MB.
+
+To replace it:
 
 ```
-ffmpeg -i SOURCE.mov -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" \
-  -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 28 -preset slow \
+ffmpeg -ss <start> -i SOURCE.MOV \
+  -vf "colorspace=iall=bt2020:itrc=bt2020-10:all=bt709:format=yuv420p,fps=30,scale=1080:1920:flags=lanczos" \
+  -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 30 -preset slow \
   -an -movflags +faststart src/assets/video/ledder.mp4
 ffmpeg -i src/assets/video/ledder.mp4 -frames:v 1 -q:v 2 src/assets/video/ledder-poster.jpg
 ```
 
-Three of those flags are load-bearing. Without `+faststart` the `moov` atom
-lands after the payload and nothing plays until the whole file has arrived.
-Anything but `yuv420p` — 4:2:2, 10-bit — and Safari refuses the file outright.
-`-an` drops the audio track, which is dead weight on a muted background loop.
+Four things in that command are load-bearing:
+
+- `+faststart` — without it the `moov` atom lands after the payload and nothing
+  plays until the whole file has arrived.
+- `yuv420p` — anything else (4:2:2, 10-bit) and Safari refuses the file outright.
+  The phone source is 10-bit, so this conversion is mandatory, not optional.
+- The `colorspace` clause — phone footage arrives as **HLG HDR** (BT.2020
+  primaries, `arib-std-b67` transfer). Decoded naively it is watchable, because
+  HLG is designed to degrade to SDR, but the colours sit flat and desaturated.
+  This build of ffmpeg has neither `zscale` nor `libplacebo`, so a true HLG
+  tone-map isn't available; treating the transfer as `bt2020-10` and correcting
+  the primaries to BT.709 is the closest the stock `colorspace` filter gets, and
+  on this footage it is visually very near the naive decode with the gamut
+  fixed. If a proper tone-map is ever wanted, install ffmpeg with libzimg.
+- `fps=30` — the source is 120 fps, which is four times more than a background
+  clip needs and four times the bitrate.
 
 Keep it **portrait**, and regenerate the poster from the new video's first
 frame whenever the video changes. The two are separate files and the build will
@@ -113,7 +140,13 @@ the video fades in, and stays wrong for anyone autoplay is blocked for.
 
 Resolution is worth spending bytes on: the hero is full-bleed, so a 540×960
 source is upscaled ~3.5× on a desktop viewport and looks soft. 1080×1920 holds
-up at every size. Aim for under ~3 MB, raising `-crf` toward 30–32 if needed.
+up at every size. Night footage carries sensor noise and compresses far worse
+than daylight — on this clip `crf 26/30/34` came out at roughly 8.4 / 4.0 / 2.2
+MB for the full 44 s. `crf 30` is the chosen balance.
+
+The camera master (`ledder2.MOV`, 781 MB) is **not** committed —
+`src/assets/video/*.MOV` is gitignored. Keep it in the project archive; only the
+encoded web version belongs in the repo.
 
 A plain `<img class="hero__poster">` sits underneath the `<video>` and is what
 actually paints — the LCP candidate — so the frame is never blank while the
@@ -141,9 +174,10 @@ is recorded as deliberate in the comment above `tick()` in `src/js/marquee.js`:
 ambient motion the page wants running unconditionally. Flip it if that stance
 ever changes.
 
-`.hero__scrim` is the original gradient along the top only. A band across the
-middle was added to keep the exhibition link legible and then removed by
-request — see Performance below before assuming the link is readable.
+`.hero__scrim` is the original gradient along the top only — it carries the
+ring text where it crosses the sky and reaches nothing else. The exhibition link
+does not depend on it: it sits on a white card (see Notes), which is what makes
+it readable over a night shot without darkening the video at all.
 
 ### Drifting rugs
 
@@ -221,7 +255,7 @@ CSS inlined, measured from the built files in `public/`):
 
 | | requests | transfer |
 |---|---|---|
-| `/` (landing) | 5 | 1.40 MB |
+| `/` (landing) | 5 | 2.02 MB |
 | `/zwischentoene.html` | 7 | **40 KB** |
 
 **Splitting the two screens is what makes the exhibition page cheap.** It used
@@ -230,9 +264,11 @@ landing page, everything the exhibition needs — markup, critical CSS, the
 deferred stylesheet, the menu and rug script, the woven background and all three
 rugs — adds up to 40 KB.
 
-The landing page is the expensive one, and it is nearly all video: 1.35 MB of
-its 1.40 MB. That is an explicit trade for the full-bleed shopfront, made with
-the cost known. Everything else on it is under 50 KB. The poster is preloaded at
+The landing page is the expensive one, and it is nearly all video: 2.0 MB of its
+2.02 MB. That is an explicit trade for the full-bleed shopfront, made with the
+cost known — the night footage was budgeted at `crf 30` against measured
+alternatives of ~2.2 MB (`crf 34`, mushy shadows) and ~8.4 MB (`crf 26`).
+Everything else on the page is under 40 KB. The poster is preloaded at
 `fetchpriority="high"` and is the LCP candidate, so the first paint does not
 wait on the video — and with no loading screen in front of it any more, nothing
 covers the viewport while it arrives.
@@ -242,10 +278,11 @@ single-page build with its 1.5 s loading screen, so they no longer describe this
 site and have been dropped rather than carried over. If the number matters,
 re-measure it.
 
-If the video's bytes ever need trimming: it is currently `crf 28`; pushing
-higher (this footage tolerated `crf 32` with no visible difference in testing)
-or capping its width would both cut more, at some cost to how sharp it reads on
-a large desktop screen where `cover` scales it up.
+If the video's bytes ever need trimming: it is currently `crf 30` over a 24.9 s
+cut. Raising the crf, shortening the cut further, or capping its width would all
+help, at some cost to how it reads on a large desktop screen where `cover`
+scales it up — and night footage shows compression artefacts in the shadows
+much sooner than daylight did.
 
 ## Notes
 
@@ -268,21 +305,17 @@ a large desktop screen where `cover` scales it up.
   description and in the `ExhibitionEvent` JSON-LD; changing them means editing
   `src/zwischentoene.html` and the `exhibition` object in
   `scripts/build-html.mjs`.
-- **The exhibition link on the landing page has no reliable contrast.** It is
-  set in the site's own burgundy (`#37161d`, the same `--bg` as the exhibition
-  page), which sits close to black — against the video behind it this measures
-  **1.22:1 on mobile and 1.34:1 on desktop at worst**, far below the 3:1 that
-  text this size needs. It reads fine against the bright parts of the video
-  (up to 10.9:1 in the frames sampled) and nearly vanishes against the dark
-  interior of the shopfront window. This is an explicit style choice — the
-  burgundy was asked for by name to match the main page's palette — not an
-  oversight, and no scrim currently compensates for it (one was tried for the
-  previous colour and removed by request; see the git history on
-  `.hero__scrim` in `src/css/landing.css` if it's worth revisiting for this
-  colour too).
+- **The exhibition link sits on a white card, and that is what makes it
+  readable.** It is set in the site's burgundy (`#37161d`), which is close to
+  black; the landing video is now a night shot, and no scrim is wanted over it.
+  Measured directly against the footage the type came out near 1:1 — invisible.
+  On the white card the same burgundy measures **16.2:1**, comfortably past
+  AAA, and the video behind it is left completely untouched. This is why
+  `.hero__footer` has a background at all; it is not decoration.
 
-  Measured by compositing the scrim over 17 frames sampled across the video,
-  mapping the link's real bounding box through `object-fit: cover`, and taking
-  the worst and best pixel in each. Re-measure if the video is replaced.
+  The card is `width: max-content` rather than the default shrink-to-fit,
+  because an auto-width absolutely positioned box at `left: 50%` is only
+  offered half the viewport — the centring transform does not feed back into
+  layout — which wrapped the label onto two lines on a phone.
 - Body copy on the exhibition page sits over the burgundy ground and the rugs,
   not over video, so it is not subject to the above.

@@ -6,3 +6,8 @@ npm-debug.log*
 .env
 .env.*
 .claude/
+
+# Camera masters. The encoded web version (video/ledder.mp4) is committed
+# instead; these are hundreds of MB and belong in the project archive, not here.
+src/assets/video/*.MOV
+src/assets/video/*.mov

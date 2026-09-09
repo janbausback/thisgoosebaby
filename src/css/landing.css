@@ -85,20 +85,30 @@ body { background: #000; }
 
 .hero-marquee__measure { visibility: hidden; }
 
-/* Centred in the frame. Width rather than `white-space: nowrap`, because the
-   exhibition line is long enough to overrun a narrow phone on one line — it
-   wraps after the colon instead of overflowing.
+/* Centred in the frame, sized to its own text — max-width rather than width, so
+   the white card wraps the two lines rather than spanning a fixed column.
 
-   Helvetica regular rather than Arial Black, and the site's own burgundy
-   (#37161d, the --bg on the exhibition page) rather than the pale green this
-   used before — var(--font) is Helvetica Neue/Helvetica/Inter/Arial, defined
-   on :root in critical.css and shared by every page. */
+   Helvetica regular in the site's own burgundy (#37161d, the --bg on the
+   exhibition page); var(--font) is Helvetica Neue/Helvetica/Inter/Arial,
+   defined on :root in critical.css and shared by every page.
+
+   The white card is what makes this readable. The video is now a night shot,
+   and burgundy is close to black — against the footage it measured near 1:1,
+   with no scrim wanted. On white the same burgundy is about 15:1, so the type
+   stays legible on every frame without darkening the video at all. */
 .hero__footer {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(90vw, 34rem);
+  /* max-content, not the default shrink-to-fit: with `left: 50%` the available
+     width an auto-width absolute box gets is only half the viewport — the
+     centring transform does not feed back into layout — which wrapped the
+     label onto two lines on a phone. */
+  width: max-content;
+  max-width: min(90vw, 34rem);
+  padding: 1.1em 1.6em;
+  background: #fff;
   text-align: center;
   color: #37161d;
   font-family: var(--font);
@@ -118,24 +128,23 @@ body { background: #000; }
   opacity: 0.9;
 }
 
+/* No underline at all — the white card is what marks this out, and the label
+   above it says what the name is. */
 .hero__link {
   display: inline-block;
-  padding: 0.1em 0.6em 0.35em;   /* a real tap target, not just the glyphs */
+  padding: 0.1em 0.4em 0.2em;   /* a real tap target, not just the glyphs */
   color: inherit;
   font-size: clamp(1.1rem, 5.5vw, 1.6rem);
   letter-spacing: -0.04em;
   line-height: 1.25;
   opacity: 0.9;
-  text-decoration: underline;
-  text-decoration-thickness: 0.06em;
-  text-underline-offset: 0.22em;
-  text-decoration-color: rgba(55, 22, 29, 0.5);
-  transition: opacity 200ms ease, text-decoration-color 200ms ease;
+  text-decoration: none;
+  transition: opacity 200ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 @media (hover: hover) {
-  .hero__link:hover { opacity: 1; text-decoration-color: currentColor; }
+  .hero__link:hover { opacity: 1; }
 }
 
 @media (min-width: 700px) {
