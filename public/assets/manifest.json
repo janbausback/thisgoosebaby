@@ -18,17 +18,17 @@
   },
   "poster": {
     "widths": {
-      "480": "/assets/poster-480.2b85c193.webp",
-      "960": "/assets/poster-960.da241207.webp",
-      "1440": "/assets/poster-1440.f12a5e13.webp"
+      "480": "/assets/poster-480.da704c02.webp",
+      "960": "/assets/poster-960.bcad030f.webp",
+      "1440": "/assets/poster-1440.cda760a9.webp"
     },
-    "srcset": "/assets/poster-480.2b85c193.webp 480w, /assets/poster-960.da241207.webp 960w, /assets/poster-1440.f12a5e13.webp 1440w",
+    "srcset": "/assets/poster-480.da704c02.webp 480w, /assets/poster-960.bcad030f.webp 960w, /assets/poster-1440.cda760a9.webp 1440w",
     "w": 1440,
     "h": 2560,
-    "src": "/assets/poster-1440.f12a5e13.webp"
+    "src": "/assets/poster-1440.cda760a9.webp"
   },
   "video": {
-    "src": "/assets/hero.a678a739.mp4"
+    "src": "/assets/hero.74a9e7df.mp4"
   },
   "bg": {
     "widths": {

@@ -101,14 +101,23 @@ from the `<video>` in `src/index.html`; it plays once and rests on the final
 open frame. Restore `loop` only if the footage is ever replaced with something
 that actually cycles.
 
-Current cut: `ledder2.MOV` trimmed from 26.2 s to the end and run at 1.5×,
-giving 12.0 s at 1080×1920 / 30 fps, 1.0 MB. (The camera reframes over t≈14–19
-in the master, so any start after ~19 s keeps the framing locked.)
+Current cut: `ledder2.MOV` from 7.0 s to the end, run at 1.5× — 24.8 s at
+1080×1920 / 30 fps, 2.1 MB.
+
+**The start is 7 s because that is the last point where the shutter is still
+fully down.** The shot is a reveal, so it has to open on a closed gate or there
+is nothing to reveal. The cost is the camera reframe/zoom at t≈14–19 in the
+master, which lands ≈4.7–8 s into the cut and brings a brief exposure dip with
+it. That is unavoidable at any start early enough to catch the closed shutter,
+because the reveal passes straight through it. An earlier cut began at 19.2 s
+to dodge the reframe and opened on a half-raised shutter instead; the closed
+opening was judged worth the wobble. Do not "fix" the reframe by moving the
+start later without knowing that trade was made deliberately.
 
 The speed-up is baked into the encode rather than set as `playbackRate` on the
-element, and the start is a trim rather than a `currentTime` seek: both keep the
-file smaller — this cut is half the bytes of the untrimmed 1× version — and
-avoid asking the browser to seek a just-loaded stream before it can paint.
+element, and the start is a trim rather than a `currentTime` seek. Both keep the
+file smaller — 1.5× alone takes a third off — and avoid asking the browser to
+seek a stream it has only just begun loading before it can paint.
 
 To replace it:
 
@@ -150,8 +159,8 @@ Resolution is worth spending bytes on: the hero is full-bleed, so a 540×960
 source is upscaled ~3.5× on a desktop viewport and looks soft. 1080×1920 holds
 up at every size. Night footage carries sensor noise and compresses far worse
 than daylight — on this clip `crf 26/30/34` came out at roughly 8.4 / 4.0 / 2.2
-MB for the full 44 s. `crf 30` is the chosen balance, and the 12 s cut brings
-the file to 1.0 MB.
+MB for the full 44 s. `crf 30` is the chosen balance; the 24.8 s cut at 1.5×
+lands at 2.1 MB.
 
 The camera master (`ledder2.MOV`, 781 MB) is **not** committed —
 `src/assets/video/*.MOV` is gitignored. Keep it in the project archive; only the
@@ -264,7 +273,7 @@ CSS inlined, measured from the built files in `public/`):
 
 | | requests | transfer |
 |---|---|---|
-| `/` (landing) | 5 | 1.06 MB |
+| `/` (landing) | 5 | 2.16 MB |
 | `/zwischentoene.html` | 7 | **41 KB** |
 
 **Splitting the two screens is what makes the exhibition page cheap.** It used
@@ -273,8 +282,8 @@ landing page, everything the exhibition needs — markup, critical CSS, the
 deferred stylesheet, the menu and rug script, the woven background and all three
 rugs — adds up to 41 KB.
 
-The landing page is the expensive one, and it is nearly all video: 1.0 MB of its
-1.06 MB. That is an explicit trade for the full-bleed shopfront, made with the
+The landing page is the expensive one, and it is nearly all video: 2.1 MB of its
+2.16 MB. That is an explicit trade for the full-bleed shopfront, made with the
 cost known — the night footage was budgeted at `crf 30` against measured
 alternatives of ~2.2 MB (`crf 34`, mushy shadows) and ~8.4 MB (`crf 26`).
 Everything else on the page is under 40 KB. The poster is preloaded at
@@ -287,7 +296,7 @@ single-page build with its 1.5 s loading screen, so they no longer describe this
 site and have been dropped rather than carried over. If the number matters,
 re-measure it.
 
-If the video's bytes ever need trimming: it is currently `crf 30` over a 12.0 s
+If the video's bytes ever need trimming: it is currently `crf 30` over a 24.8 s
 cut. Raising the crf, shortening the cut further, or capping its width would all
 help, at some cost to how it reads on a large desktop screen where `cover`
 scales it up — and night footage shows compression artefacts in the shadows
