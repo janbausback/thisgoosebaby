@@ -85,70 +85,70 @@ body { background: #000; }
 
 .hero-marquee__measure { visibility: hidden; }
 
-/* A framed plaque: cream field, burgundy frame, a second rule set inside it.
-   Sized to its own text — max-width rather than width, so the card wraps the
-   two lines rather than spanning a fixed column.
+/* No card. The exhibition's own wordmark, drawn as an outline so the video
+   reads through the letterforms — vinyl on the shopfront glass, which is
+   literally what is behind it. The solid cream plaque that stood here was the
+   only hard-edged, high-contrast rectangle on a page whose language is
+   otherwise soft (a hand-printed ring, blurred rugs, a night photograph), and
+   it read as a UI component laid over the picture.
 
-   Helvetica regular in the site's own burgundy (#37161d, the --bg on the
-   exhibition page); var(--font) is Helvetica Neue/Helvetica/Inter/Arial,
-   defined on :root in critical.css and shared by every page.
-
-   The card is what makes this readable, and is not decoration. The video is a
-   night shot and burgundy is close to black — measured directly against the
-   footage the type came out near 1:1, invisible, with no scrim wanted over the
-   video. On the cream field the same burgundy is 13.5:1, so the type holds on
-   every frame while the picture behind it stays untouched. */
+   Contrast no longer needs a background to sit on: the footage is a night shot,
+   so cream on it measures far past AA even before the halo below. */
 .hero__footer {
-  /* Sits low in the frame, over the pavement, rather than centred on the
-     shutter. On a portrait phone that lands the plaque on the paving stones;
-     on a wide viewport `cover` has already cropped the pavement away, so it
-     simply reads as the lower quarter of the picture. */
   position: absolute;
   top: 78%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* max-content, not the default shrink-to-fit: with `left: 50%` the available
-     width an auto-width absolute box gets is only half the viewport — the
-     centring transform does not feed back into layout — which wrapped the
-     label onto two lines on a phone. */
-  width: max-content;
-  max-width: min(90vw, 34rem);
-  padding: 0.85em 1.9em 1em;
-  background: #efeae1;
-  /* One variable drives both rules of the frame, so the keyline below can never
-     drift out of step with the border. */
-  border: clamp(4px, 1.15vw, 7px) solid #37161d;
-  border-radius: 2px;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
+  /* The wordmark is 2817×412 (≈6.8:1), so width sets the whole block. */
+  width: min(72vw, 24rem);
   text-align: center;
-  color: #37161d;
+  color: #efeae1;
   font-family: var(--font);
   font-weight: 400;
 }
 
-/* The dates are not part of the link — only the exhibition's name is. Set
-   smaller than the name, so the plaque reads name-first. Same tight
-   letter-spacing as the mark on the exhibition page. */
+/* Small and uppercase, so the wordmark leads. Positive tracking here rather
+   than the tight setting used elsewhere on the site — uppercase at this size
+   needs opening up, not closing in. */
 .hero__label {
-  margin: 0;
-  font-size: clamp(0.9rem, 3.7vw, 1.05rem);
-  font-weight: 400;
-  letter-spacing: -0.04em;
+  margin: 0 0 0.85em;
+  font-size: clamp(0.72rem, 2.9vw, 0.9rem);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
   line-height: 1.3;
+  opacity: 0.92;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.9);
 }
 
-/* No underline at all — the card is what marks this out. Same tight
-   letter-spacing as the mark on the exhibition page. */
 .hero__link {
-  display: inline-block;
-  padding: 0.05em 0.4em 0.1em;   /* a real tap target, not just the glyphs */
+  display: block;
   color: inherit;
-  font-size: clamp(1.35rem, 6.4vw, 1.9rem);
-  letter-spacing: -0.04em;
-  line-height: 1.2;
-  text-decoration: none;
+  opacity: 0.94;
   transition: opacity 200ms ease;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* cleanSvg sets fill="currentColor" as a presentation attribute; a CSS
+   declaration outranks that, which is what turns the filled mark into an
+   outline. The stroke is in user units, so it scales with the letterforms
+   instead of thinning out on a large viewport. The drop-shadow is a halo on
+   the glyphs themselves, not a panel behind them — it keeps the outline
+   readable where the shutter behind it is lit, without covering the video. */
+.hero__link svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 10;
+  stroke-linejoin: round;
+  /* Two shadows, doing different jobs. The tight one is a dark edge hugging the
+     stroke, which is what keeps a ~1px cream hairline off the lit shutter on a
+     wide viewport — there `cover` has cropped the dark pavement away and the
+     mark sits on bright, busy metal. The wide one is ambient separation. */
+  filter:
+    drop-shadow(0 0 2px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 1px 16px rgba(0, 0, 0, 0.85));
 }
 
 @media (hover: hover) {

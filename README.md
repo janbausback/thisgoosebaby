@@ -45,8 +45,8 @@ Edit files in `src/`, run a build, commit `public/`.
 ### Two screens
 
 `/` is the landing: the shopfront video full-bleed, the studio name running
-around the frame as a marquee ring, and a plaque carrying the run dates and a
-single link into the exhibition. `/zwischentoene.html` is the exhibition itself: the woven
+around the frame as a marquee ring, and the run dates over the wordmark, which
+is the single link into the exhibition. `/zwischentoene.html` is the exhibition itself: the woven
 background, the drifting rugs, and the menu.
 
 They are separate documents rather than one page that swaps state, so the
@@ -330,6 +330,42 @@ much sooner than daylight did.
   `eventSchedule` array in `scripts/build-html.mjs`. The schedule is two runs —
   10–13 September daily 14:00–20:00, then 14–30 September Thursday to Saturday
   15:00–19:00 — so `eventSchedule` is an array, not a single `Schedule`.
+- Body copy is left-aligned sitewide — the intro, every panel, and the legal
+  pages — at a larger, more editorial scale than the original centred design.
+  `.intro, .panel-body` in `src/css/main.css` is the shared type rule.
+- The exhibition runs 9–30 September 2026, Monday to Saturday 14:00–20:00,
+  closed Sundays. The dates, the venue and that schedule appear in the meta
+  description and in the `ExhibitionEvent` JSON-LD; changing them means editing
+  `src/zwischentoene.html` and the `exhibition` object in
+  `scripts/build-html.mjs`.
+- **The exhibition link is the wordmark itself, drawn as an outline.**
+  `src/index.html` pulls in `{{svg:zwischentoene}}` — the same mark the
+  exhibition page uses top-left — and `landing.css` overrides its
+  `fill="currentColor"` presentation attribute with `fill: none; stroke:
+  currentColor`, so the video reads through the letterforms. It sits on the
+  glass with no panel behind it, like vinyl on the shopfront window, which is
+  what the footage actually shows.
+
+  This replaced a solid cream plaque with a burgundy frame. That plaque was
+  legible (13.5:1) but it was the only hard-edged, high-contrast rectangle on a
+  page whose language is otherwise soft — a hand-printed ring, blurred rugs, a
+  night photograph — and it read as a UI component laid over the picture.
+
+  Two things keep it readable without a background. The footage is a night shot,
+  so cream sits well clear of it to begin with; and the `filter` on the SVG is
+  **two** drop-shadows, not one — a tight 2px dark edge hugging the stroke plus
+  a wide ambient halo. The tight one is load-bearing on desktop: there `cover`
+  crops the dark pavement away and the mark lands on the lit, graffitied
+  shutter, where a ~1px cream hairline on its own gets lost. Do not collapse
+  them into a single soft shadow.
+
+  `stroke-width` is in user units, so the outline scales with the letterforms
+  rather than thinning out as the viewport grows. The block sits at `top: 78%`,
+  which puts it on the paving stones on a portrait phone.
+
+  The SVG is inlined, which takes `index.html` from 7.8 KB to 16.7 KB. That is
+  nothing against a 2.1 MB video and it costs no extra request, but it is why
+  the landing document is larger than the exhibition one.
 - Body copy is left-aligned sitewide — the intro, every panel, and the legal
   pages — at a larger, more editorial scale than the original centred design.
   `.intro, .panel-body` in `src/css/main.css` is the shared type rule.

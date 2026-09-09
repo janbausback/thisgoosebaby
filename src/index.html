@@ -88,7 +88,11 @@
 
   <div class="hero__footer">
     <p class="hero__label">09. – 30. September</p>
-    <a class="hero__link" href="/zwischentoene.html">Zwischentöne</a>
+    <!-- The wordmark itself rather than the name set in Helvetica. cleanSvg in
+         build-html.mjs marks the SVG aria-hidden, so the link carries its own
+         accessible name. -->
+    <a class="hero__link" href="/zwischentoene.html"
+       aria-label="Zwischentöne — the current exhibition">{{svg:zwischentoene}}</a>
   </div>
 </main>
 
