@@ -3,25 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Studio Kolchina &amp; Gordon</title>
-<meta name="description" content="Studio Kolchina &amp; Gordon — an art studio and collaborative project in Berlin, working at the intersection of art, design and science. Currently showing Zwischentöne, Eisenbahnstraße 5, Berlin-Kreuzberg.">
+<title>Studio Kolchina &amp; Gordon — Art Studio in Berlin</title>
+<meta name="description" content="Studio Kolchina &amp; Gordon is an art studio and collaborative project in Berlin-Kreuzberg by Galina Kolchina and Liam Gordon, working at the intersection of art, design and science. Eisenbahnstraße 5, 10997 Berlin.">
 <link rel="canonical" href="https://kolchinagordon.com/">
 <meta name="robots" content="index, follow, max-image-preview:large">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#ffffff">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Studio Kolchina &amp; Gordon">
 <meta property="og:locale" content="en_GB">
 <meta property="og:url" content="https://kolchinagordon.com/">
 <meta property="og:title" content="Studio Kolchina &amp; Gordon">
-<meta property="og:description" content="An art studio and collaborative project in Berlin. Currently showing Zwischentöne, Eisenbahnstraße 5, Berlin-Kreuzberg.">
+<meta property="og:description" content="An art studio and collaborative project in Berlin, working at the intersection of art, design and science. Eisenbahnstraße 5, Berlin-Kreuzberg.">
 <meta property="og:image" content="https://kolchinagordon.com{{og:image}}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="The Studio Kolchina &amp; Gordon wordmark in white on blue, over a deep burgundy background.">
+<meta property="og:image:alt" content="{{og:alt}}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Studio Kolchina &amp; Gordon">
-<meta name="twitter:description" content="An art studio and collaborative project in Berlin. Currently showing Zwischentöne.">
+<meta name="twitter:description" content="An art studio and collaborative project in Berlin, working at the intersection of art, design and science.">
 <meta name="twitter:image" content="https://kolchinagordon.com{{og:image}}">
 
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -29,29 +29,31 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 
-<link rel="preload" as="image" href="{{src:poster}}" imagesrcset="{{srcset:poster}}" imagesizes="100vw" fetchpriority="high">
-
+<script>document.documentElement.className += ' js';</script>
 <style>{{critical}}</style>
 
+<script src="{{js:menu}}" defer></script>
+<script src="{{js:slideshow}}" defer></script>
 <script src="{{js:marquee}}" defer></script>
-<script src="{{js:landing}}" defer></script>
+<script src="{{js:studio}}" defer></script>
 
 <script type="application/ld+json">{{jsonld}}</script>
 </head>
 
 <body>
 
-<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+<svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
   <!--
-    Hand-printed look for the animated ring text. feTurbulence is swapped for a
-    pre-baked feImage texture (written by marquee.js): Safari recomputes
-    feTurbulence's Perlin noise from scratch on every paint even though a fixed
-    seed makes its output identical every time — that's the actual cost behind
-    the ring's stutter, not the displacement/blur/alpha steps. Baking it once
-    per layout and sampling a bitmap instead removes that redundant work.
+    Hand-printed look for the marquee: noise displaces the glyph edges a
+    fraction of a pixel, a blur and an alpha threshold re-cut them rough.
+    marquee.js sizes the region; feTile repeats the noise once per half of the
+    track so the texture loops with the text. The track moves as a composited
+    layer, so this runs once per layout — not on every frame, which is what
+    made the old ring stutter in Safari and forced its noise to be pre-baked.
   -->
-  <filter id="handPrintedRing" x="0" y="0" width="0" height="0" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse">
-    <feImage id="ringNoise" result="noise" x="0" y="0" width="0" height="0" preserveAspectRatio="none" />
+  <filter id="handPrinted" x="0" y="0" width="0" height="0" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse">
+    <feTurbulence id="handPrintedNoise" type="fractalNoise" baseFrequency="0.3 0.35" numOctaves="1" seed="7" stitchTiles="stitch" x="0" y="0" width="0" height="0" result="tile" />
+    <feTile in="tile" result="noise" />
     <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1" xChannelSelector="R" yChannelSelector="G" result="scattered" />
     <feGaussianBlur in="scattered" stdDeviation="0.5" result="softened" />
     <feComponentTransfer in="softened">
@@ -60,42 +62,48 @@
   </filter>
 </svg>
 
-<main class="hero">
-  <!-- The poster is a plain <img> underneath, not just the <video poster>
-       attribute, so it is on screen from first paint regardless of autoplay —
-       JS fades the video in once it is truly playing. -->
-  <img class="hero__poster" src="{{src:poster}}" srcset="{{srcset:poster}}"
-       sizes="100vw" width="{{w:poster}}" height="{{h:poster}}" alt=""
-       aria-hidden="true" fetchpriority="high" decoding="sync">
-  <!-- No `loop`: the clip is a one-way reveal — the shutter rises to expose the
-       lit interior — so it plays once and rests on the final open frame. -->
-  <video class="hero__video" src="{{src:video}}" poster="{{src:poster}}"
-         autoplay muted playsinline></video>
+{{header}}
 
-  <div class="hero__scrim"></div>
+<main class="home">
+  <section class="hero" aria-labelledby="site-title">
+    <h1 class="visually-hidden" id="site-title">Studio Kolchina &amp; Gordon</h1>
 
-  <h1 class="visually-hidden">Studio Kolchina &amp; Gordon</h1>
+    <!-- Three photographs, stacked; slideshow.js cuts between them. The first
+         is the one that paints, so it alone is fetched at high priority. -->
+    <div class="hero__frame">
+      <img class="hero__img is-active" src="{{src:hero1}}" srcset="{{srcset:hero1}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:hero1}}" height="{{h:hero1}}"
+           alt="Rugs in black, burgundy and ochre hang from the ceiling of the white studio, framing a woven stool"
+           fetchpriority="high">
+      <img class="hero__img" src="{{src:hero2}}" srcset="{{srcset:hero2}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:hero2}}" height="{{h:hero2}}"
+           alt="The graffiti-covered shopfront at Eisenbahnstraße 5, with a woman walking past"
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:hero3}}" srcset="{{srcset:hero3}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:hero3}}" height="{{h:hero3}}"
+           alt="An olive rug hangs beside an aluminium chest of drawers, under a photograph on the studio wall"
+           decoding="async" fetchpriority="low">
+    </div>
 
-  <svg class="hero-marquee" aria-hidden="true" focusable="false">
-    <defs>
-      <path id="framePath"></path>
-    </defs>
-    <text id="frameMeasure" class="hero-marquee__text hero-marquee__measure"></text>
-    <text class="hero-marquee__text">
-      <textPath id="frameTextPath" xlink:href="#framePath" href="#framePath" startOffset="0%"></textPath>
-    </text>
-  </svg>
+    <!-- Static and a few repeats long without script; marquee.js rebuilds it
+         to the viewport's width and sets it running. -->
+    <div class="marquee" aria-hidden="true">
+      <svg class="marquee__track" focusable="false"><text class="marquee__text" x="0" y="1.107em" xml:space="preserve">STUDIO KOLCHINA &amp; GORDON&#160;•&#160;STUDIO KOLCHINA &amp; GORDON&#160;•&#160;STUDIO KOLCHINA &amp; GORDON&#160;•&#160;STUDIO KOLCHINA &amp; GORDON&#160;•&#160;</text></svg>
+    </div>
+  </section>
 
-  <div class="hero__footer">
-    <!-- The wordmark itself rather than the name set in Helvetica. cleanSvg in
-         build-html.mjs marks the SVG aria-hidden, so the link carries its own
-         accessible name. The dates follow it in source order as well as
-         visually, so the reading order matches what is on screen. -->
-    <a class="hero__link" href="/zwischentoene.html"
-       aria-label="Zwischentöne — the current exhibition">{{svg:zwischentoene}}</a>
-    <p class="hero__label">09. – 30. September</p>
-  </div>
+  <section class="studio" aria-labelledby="studio-title">
+    <h2 class="visually-hidden" id="studio-title">The Studio</h2>
+    <p class="studio__text">Studio Kolchina &amp; Gordon is an art studio and collaborative project based in Berlin, working at the intersection of art, design, and science. Built around the ongoing partnership between visual artist and curator Galina Kolchina and composer and musician Liam Gordon, the studio brings together brands and artists who share a common vision and sensibility.</p>
+    <p class="studio__text">The studio operates as a place of encounter: a rotating programme of artists and brands.</p>
+    <img class="studio__img" src="{{src:about}}" srcset="{{srcset:about}}"
+         sizes="(min-aspect-ratio: 4/5) 32vh, 40vw" width="{{w:about}}" height="{{h:about}}"
+         alt="Black-and-white photograph of visitors gathered on the pavement outside the studio at Eisenbahnstraße 5"
+         loading="lazy" decoding="async">
+  </section>
 </main>
+
+{{footer}}
 
 </body>
 </html>

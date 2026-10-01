@@ -1,83 +1,104 @@
 {
   "icon192": {
-    "src": "/assets/icon-192.b9109cf2.png"
+    "src": "/assets/icon-192.6d53cb57.png"
   },
   "icon512": {
-    "src": "/assets/icon-512.bff79252.png"
+    "src": "/assets/icon-512.655de2f6.png"
   },
   "icon512m": {
-    "src": "/assets/icon-512-maskable.bff79252.png"
-  },
-  "css": {
-    "src": "/assets/main.5a399d32.css"
+    "src": "/assets/icon-512-maskable.655de2f6.png"
   },
   "og": {
-    "src": "/assets/og-image.8faca45a.jpg",
+    "src": "/assets/og-image.9e262998.jpg",
     "w": 1200,
     "h": 630
   },
-  "poster": {
-    "widths": {
-      "480": "/assets/poster-480.da704c02.webp",
-      "960": "/assets/poster-960.bcad030f.webp",
-      "1440": "/assets/poster-1440.cda760a9.webp"
-    },
-    "srcset": "/assets/poster-480.da704c02.webp 480w, /assets/poster-960.bcad030f.webp 960w, /assets/poster-1440.cda760a9.webp 1440w",
-    "w": 1440,
-    "h": 2560,
-    "src": "/assets/poster-1440.cda760a9.webp"
-  },
-  "video": {
-    "src": "/assets/hero.74a9e7df.mp4"
-  },
-  "bg": {
-    "widths": {
-      "480": "/assets/bg-480.3983d471.webp",
-      "960": "/assets/bg-960.7cdf46e3.webp",
-      "1440": "/assets/bg-1440.aab4de95.webp"
-    },
-    "srcset": "/assets/bg-480.3983d471.webp 480w, /assets/bg-960.7cdf46e3.webp 960w, /assets/bg-1440.aab4de95.webp 1440w",
-    "w": 1440,
-    "h": 2030,
-    "src": "/assets/bg-1440.aab4de95.webp"
-  },
-  "teppich1": {
-    "widths": {
-      "480": "/assets/teppich1-480.9d12e29f.webp",
-      "960": "/assets/teppich1-960.dc986694.webp"
-    },
-    "srcset": "/assets/teppich1-480.9d12e29f.webp 480w, /assets/teppich1-960.dc986694.webp 960w",
-    "w": 960,
-    "h": 1406,
-    "src": "/assets/teppich1-960.dc986694.webp"
-  },
-  "teppich2": {
-    "widths": {
-      "480": "/assets/teppich2-480.3e95aa29.webp",
-      "960": "/assets/teppich2-960.2f203679.webp"
-    },
-    "srcset": "/assets/teppich2-480.3e95aa29.webp 480w, /assets/teppich2-960.2f203679.webp 960w",
-    "w": 960,
-    "h": 1330,
-    "src": "/assets/teppich2-960.2f203679.webp"
-  },
-  "teppich3": {
-    "widths": {
-      "480": "/assets/teppich3-480.efe854df.webp",
-      "960": "/assets/teppich3-960.dce8452b.webp"
-    },
-    "srcset": "/assets/teppich3-480.efe854df.webp 480w, /assets/teppich3-960.dce8452b.webp 960w",
-    "w": 960,
-    "h": 1256,
-    "src": "/assets/teppich3-960.dce8452b.webp"
-  },
-  "js_landing": {
-    "src": "/assets/landing.212d220b.js"
-  },
-  "js_main": {
-    "src": "/assets/main.fefdd76d.js"
-  },
   "js_marquee": {
-    "src": "/assets/marquee.b94391b8.js"
+    "src": "/assets/marquee.bcf4dda3.js"
+  },
+  "hero1": {
+    "widths": {
+      "480": "/assets/hero1-480.524b8c87.webp",
+      "720": "/assets/hero1-720.023a98da.webp",
+      "1080": "/assets/hero1-1080.e757205e.webp"
+    },
+    "srcset": "/assets/hero1-480.524b8c87.webp 480w, /assets/hero1-720.023a98da.webp 720w, /assets/hero1-1080.e757205e.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/hero1-1080.e757205e.webp"
+  },
+  "hero2": {
+    "widths": {
+      "480": "/assets/hero2-480.9582ff6f.webp",
+      "720": "/assets/hero2-720.e6ba78d4.webp",
+      "1080": "/assets/hero2-1080.5702f4e2.webp"
+    },
+    "srcset": "/assets/hero2-480.9582ff6f.webp 480w, /assets/hero2-720.e6ba78d4.webp 720w, /assets/hero2-1080.5702f4e2.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/hero2-1080.5702f4e2.webp"
+  },
+  "hero3": {
+    "widths": {
+      "480": "/assets/hero3-480.9b249b15.webp",
+      "720": "/assets/hero3-720.1f08cb09.webp",
+      "1080": "/assets/hero3-1080.748cfca8.webp"
+    },
+    "srcset": "/assets/hero3-480.9b249b15.webp 480w, /assets/hero3-720.1f08cb09.webp 720w, /assets/hero3-1080.748cfca8.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/hero3-1080.748cfca8.webp"
+  },
+  "about": {
+    "widths": {
+      "480": "/assets/about-480.82645657.webp",
+      "960": "/assets/about-960.7b6f5785.webp"
+    },
+    "srcset": "/assets/about-480.82645657.webp 480w, /assets/about-960.7b6f5785.webp 960w",
+    "w": 960,
+    "h": 657,
+    "src": "/assets/about-960.7b6f5785.webp"
+  },
+  "zw1": {
+    "widths": {
+      "480": "/assets/zw1-480.7db23e3a.webp",
+      "720": "/assets/zw1-720.b31c959f.webp",
+      "1080": "/assets/zw1-1080.8ef2023f.webp"
+    },
+    "srcset": "/assets/zw1-480.7db23e3a.webp 480w, /assets/zw1-720.b31c959f.webp 720w, /assets/zw1-1080.8ef2023f.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/zw1-1080.8ef2023f.webp"
+  },
+  "zw2": {
+    "widths": {
+      "480": "/assets/zw2-480.be28a0f6.webp",
+      "720": "/assets/zw2-720.183cf217.webp",
+      "1080": "/assets/zw2-1080.01a1b2f3.webp"
+    },
+    "srcset": "/assets/zw2-480.be28a0f6.webp 480w, /assets/zw2-720.183cf217.webp 720w, /assets/zw2-1080.01a1b2f3.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/zw2-1080.01a1b2f3.webp"
+  },
+  "zw3": {
+    "widths": {
+      "480": "/assets/zw3-480.48531d92.webp",
+      "720": "/assets/zw3-720.64f6fae2.webp",
+      "1080": "/assets/zw3-1080.eb4ec514.webp"
+    },
+    "srcset": "/assets/zw3-480.48531d92.webp 480w, /assets/zw3-720.64f6fae2.webp 720w, /assets/zw3-1080.eb4ec514.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/zw3-1080.eb4ec514.webp"
+  },
+  "js_menu": {
+    "src": "/assets/menu.c1c26504.js"
+  },
+  "js_slideshow": {
+    "src": "/assets/slideshow.bcd28387.js"
+  },
+  "js_studio": {
+    "src": "/assets/studio.f09d004d.js"
   }
 }

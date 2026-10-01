@@ -1,7 +1,7 @@
-# Zwischentöne
+# Studio Kolchina & Gordon
 
-Two-page site for **Studio Kolchina & Gordon** and its current exhibition,
-**Zwischentöne** by Clara Twele and Galina Kolchina.
+Website of **Studio Kolchina & Gordon**, an art studio and collaborative project
+in Berlin-Kreuzberg by Galina Kolchina and Liam Gordon.
 
 Live: <https://kolchinagordon.com>
 
@@ -9,32 +9,43 @@ Plain HTML, CSS and vanilla JS. No framework, no runtime dependencies, no
 third-party requests — no fonts, no analytics, no CDN. Everything in `public/`
 is committed, so Netlify deploys it without running a build.
 
+Until October 2026 this repo was the site of the exhibition **Zwischentöne**
+(Clara Twele and Galina Kolchina, 9–30 September 2026). That version is tagged
+`zwischentoene-archive`; the exhibition itself now lives under Previous
+Projects. See [Archive](#archive).
+
 ---
 
 ## Local preview
 
 ```bash
 npm install      # only needed for the build scripts
-npm run serve    # → http://localhost:4173
+npm run serve    # → http://localhost:4173, and the LAN address for a phone
 ```
 
-`npm run serve` is a dependency-free static server over `public/`. Any other
-static server works too — nothing is generated at request time.
+`npm run serve` is a dependency-free static server over `public/`. It listens
+on every interface and prints the machine's LAN address as well, e.g.
+`http://192.168.178.64:4173` — open that on a phone on the same Wi-Fi. macOS
+may ask once whether `node` may accept incoming connections; allow it, or the
+phone will time out. The address comes from the router and can change; the
+server prints the current one on every start.
 
 ## Layout
 
 ```
 src/            what you edit
-  assets/         original images, SVGs, and video/ledder.mp4 (landing video)
-  css/            critical.css   shared base, inlined into every <head>
-                  landing.css    inlined into / only
-                  site.css       inlined into the exhibition and legal pages
-                  main.css       deferred — menu, panels, footer, legal
-  js/             marquee.js + landing.js  (the landing page)
-                  main.js                  (the exhibition page)
-  index.html          templates — {{tokens}} are filled in at build time
-  zwischentoene.html
-  imprint.html
+  assets/photos/  JPEG masters of every photograph (see Photographs)
+  css/            critical.css   shared base, header, menu, footer — every page
+                  home.css       the landing page
+                  page.css       the subpages
+  js/             menu.js        the burger menu — every page
+                  slideshow.js   the landing picture's hard cuts
+                  marquee.js     the line of type across it
+                  studio.js      sizes the studio text to one screen
+  index.html              templates — {{tokens}} are filled in at build time
+  on-view.html
+  previous-projects.html
+  contact.html            (includes the Impressum)
   privacy.html
 public/         what is deployed — generated, and committed
 scripts/        the build
@@ -42,364 +53,290 @@ scripts/        the build
 
 Edit files in `src/`, run a build, commit `public/`.
 
-### Two screens
+## Pages
 
-`/` is the landing: the shopfront video full-bleed, the studio name running
-around the frame as a marquee ring, and the wordmark — the single link into the
-exhibition — with the run dates hung under it. `/zwischentoene.html` is the exhibition itself: the woven
-background, the drifting rugs, and the menu.
+| URL | |
+|---|---|
+| `/` | One photograph in the middle, cutting between three; the studio's name running across it; below, the studio text set to fill one screen, then a fourth photograph, centred. |
+| `/on-view.html` | The current exhibition. Right now: “Next exhibition will start in November. Stay close.” |
+| `/previous-projects.html` | Past exhibitions, newest first, one `<article>` each. Zwischentöne is the first. |
+| `/contact.html` | Email, address, Instagram (Galina Kolchina, Liam Gordon) — and the Impressum, at `#impressum`. |
+| `/privacy.html` | Datenschutzerklärung. `noindex`. |
 
-They are separate documents rather than one page that swaps state, so the
-exhibition has a URL that can be shared and linked, the back button works, and
-each gets its own OG card. They share the type stack and very little else,
-which is why the critical CSS is split per page — the landing never downloads
-the menu styles, and the exhibition never downloads the marquee.
+The header, menu and footer are not in the templates: `{{header}}` and
+`{{footer}}` are rendered by `scripts/build-html.mjs`, which marks the current
+page in the menu (`aria-current`) and adds the home link on every page but
+`/`. The menu's items and order are the `MENU` array there.
 
-There is no loading screen. The landing page is itself the entrance, so a
-wordmark hold in front of the exhibition would repeat branding the visitor has
-just come through.
+To add a project, put a new `<article class="project" id="…">` above the
+Zwischentöne one in `src/previous-projects.html`, add its photographs to
+`PHOTOS` in `scripts/build-images.mjs`, and — if it should carry structured
+data — an `ExhibitionEvent` beside `zwischentoene` in `build-html.mjs`.
 
 ## Build
 
 ```bash
-npm run build          # images → icons → HTML
-npm run build:images   # sources → responsive WebP
-npm run build:icons    # flat burgundy favicons
+npm run build          # images → social card → icons → HTML
+npm run build:images   # photo masters → responsive WebP
+npm run build:og       # social preview image, then HTML
+npm run build:icons    # flat purple favicons
 npm run build:html     # templates → public/, inlining CSS and SVGs
-npm run build:og       # social preview image, cropped from src/assets/preview2.jpg
 ```
 
 `npm run build` is safe to re-run at any time and is what you want after
-changing anything in `src/`.
+changing anything in `src/`. After a change to HTML, CSS or JS only,
+`npm run build:html` is enough.
 
-### Images
+Filenames under `/assets/` carry a content hash, which is what lets
+`netlify.toml` serve them as `immutable` — replace an image, re-run the build,
+and the URL changes with it. `build:html` runs last and prunes any file in
+`public/assets/` the manifest no longer references.
 
-`build:images` converts every source raster to responsive WebP and wires the
-widths into `srcset`: the landing video's poster at 480 / 960 / 1440, the woven
-background at the same three, and the three rugs at 480 / 960. Filenames carry
-a content hash, which is what lets `netlify.toml` serve all of `/assets/*` as
-`immutable` — replace an image, re-run the build, and the URL changes with it.
-Stale files are pruned automatically.
+Every page's CSS is inlined into its `<head>` — the shared base plus either
+`home.css` or `page.css`, about 6 KB either way — so no page waits on a
+stylesheet request.
 
-Quality is set low on purpose. The rugs and the background are near-flat woven
-fields whose own grain sets the noise floor, so q70 costs roughly 2.3× the bytes
-of q50 for under 1 dB of PSNR.
+### Photographs
 
-### Landing video
+The camera originals are in the project folder,
+`Studio Kolchina & Gordon/Default/` — HEIC and full-size JPEG, 4–7 MB each.
+The repo keeps JPEG **masters** instead, in `src/assets/photos/`: upright,
+2400 px on the long edge, sRGB. `build:images` turns those into WebP at the
+widths each picture is actually drawn at (see `PHOTOS` in
+`scripts/build-images.mjs` for the reasoning per picture).
 
-The landing page's background is a muted, autoplaying video
-(`src/assets/video/ledder.mp4`), not sharp-processed since it isn't a raster —
-`build:images` just content-hashes and copies it. It is re-encoded once by hand
-before being dropped in; there's no dependency on `ffmpeg` in the build itself,
-only in however the source file was prepared.
+To replace or add one, make a master from the original. `sharp` cannot read
+HEIC, so macOS's `sips` converts it first:
 
-**It does not loop.** The clip is a one-way reveal — a night shot in which the
-shopfront's roller shutter rises to expose the lit interior — so it has no
-natural loop point: it starts closed and ends open, and looping it would snap
-back to a shut shutter every pass. The `loop` attribute is deliberately absent
-from the `<video>` in `src/index.html`; it plays once and rests on the final
-open frame. Restore `loop` only if the footage is ever replaced with something
-that actually cycles.
-
-Current cut: `ledder2.MOV` from 7.0 s to the end, run at 1.5× — 24.8 s at
-1080×1920 / 30 fps, 2.1 MB.
-
-**The start is 7 s because that is the last point where the shutter is still
-fully down.** The shot is a reveal, so it has to open on a closed gate or there
-is nothing to reveal. The cost is the camera reframe/zoom at t≈14–19 in the
-master, which lands ≈4.7–8 s into the cut and brings a brief exposure dip with
-it. That is unavoidable at any start early enough to catch the closed shutter,
-because the reveal passes straight through it. An earlier cut began at 19.2 s
-to dodge the reframe and opened on a half-raised shutter instead; the closed
-opening was judged worth the wobble. Do not "fix" the reframe by moving the
-start later without knowing that trade was made deliberately.
-
-The speed-up is baked into the encode rather than set as `playbackRate` on the
-element, and the start is a trim rather than a `currentTime` seek. Both keep the
-file smaller — 1.5× alone takes a third off — and avoid asking the browser to
-seek a stream it has only just begun loading before it can paint.
-
-To replace it:
-
-```
-ffmpeg -ss <start> -i SOURCE.MOV \
-  -vf "colorspace=iall=bt2020:itrc=bt2020-10:all=bt709:format=yuv420p,setpts=PTS/1.5,fps=30,scale=1080:1920:flags=lanczos" \
-  -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 30 -preset slow \
-  -an -movflags +faststart src/assets/video/ledder.mp4
-ffmpeg -i src/assets/video/ledder.mp4 -frames:v 1 -q:v 2 src/assets/video/ledder-poster.jpg
+```bash
+sips -s format jpeg -s formatOptions 95 IMG.HEIC --out /tmp/full.jpg
+node -e "require('sharp')('/tmp/full.jpg').rotate()
+  .resize({width:2400,height:2400,fit:'inside',withoutEnlargement:true})
+  .jpeg({quality:88,mozjpeg:true}).toFile('src/assets/photos/NAME.jpg')"
+npm run build
 ```
 
-`setpts=PTS/1.5` is the speed change; drop it for 1×. It must come before
-`fps=30` so the frame-rate filter resamples the retimed stream.
+`rotate()` with no angle applies the EXIF orientation: the iPhone stores its
+portrait shots as landscape pixels plus a rotation flag, and without it they
+come out sideways. The masters are already upright, but `build:images` applies
+it again so a master exported the other way still works.
 
-Four things in that command are load-bearing:
+`about.jpg` was cut out of the white sheet it was delivered on
+(`trim({ background: '#ffffff', threshold: 24 })` before the resize); any
+replacement should be the photograph alone.
 
-- `+faststart` — without it the `moov` atom lands after the payload and nothing
-  plays until the whole file has arrived.
-- `yuv420p` — anything else (4:2:2, 10-bit) and Safari refuses the file outright.
-  The phone source is 10-bit, so this conversion is mandatory, not optional.
-- The `colorspace` clause — phone footage arrives as **HLG HDR** (BT.2020
-  primaries, `arib-std-b67` transfer). Decoded naively it is watchable, because
-  HLG is designed to degrade to SDR, but the colours sit flat and desaturated.
-  This build of ffmpeg has neither `zscale` nor `libplacebo`, so a true HLG
-  tone-map isn't available; treating the transfer as `bt2020-10` and correcting
-  the primaries to BT.709 is the closest the stock `colorspace` filter gets, and
-  on this footage it is visually very near the naive decode with the gamut
-  fixed. If a proper tone-map is ever wanted, install ffmpeg with libzimg.
-- `fps=30` — the source is 120 fps, which is four times more than a background
-  clip needs and four times the bitrate.
+All landing and project pictures are **3:4 portrait**. The hero frame and the
+project grid are both drawn at 3:4 with `object-fit: cover`, so another shape
+would be cropped, not letterboxed.
 
-Keep it **portrait**, and regenerate the poster from the new video's first
-frame whenever the video changes. The two are separate files and the build will
-not catch a mismatch, but `.hero__video` and `.hero__poster` are stacked in the
-same box under `object-fit: cover`, so differing framing shows as a jump when
-the video fades in, and stays wrong for anyone autoplay is blocked for.
+### Landing: the picture
 
-Resolution is worth spending bytes on: the hero is full-bleed, so a 540×960
-source is upscaled ~3.5× on a desktop viewport and looks soft. 1080×1920 holds
-up at every size. Night footage carries sensor noise and compresses far worse
-than daylight — on this clip `crf 26/30/34` came out at roughly 8.4 / 4.0 / 2.2
-MB for the full 44 s. `crf 30` is the chosen balance; the 24.8 s cut at 1.5×
-lands at 2.1 MB.
+Three photographs (`hero-1` … `hero-3`) are stacked in one frame and
+`slideshow.js` cuts between them every two seconds — hard cuts, no fade. The
+frame is 51 % of the width on a phone, as in the mockup, and is limited by the
+height on wider screens (`min(51vw, 41svh)`), so it never outgrows the
+viewport.
 
-The camera master (`ledder2.MOV`, 781 MB) is **not** committed —
-`src/assets/video/*.MOV` is gitignored. Keep it in the project archive; only the
-encoded web version belongs in the repo.
+A cut is only made to a picture that has loaded and decoded (`img.decode()`),
+so it never lands on a half-drawn frame; a picture that fails to load drops out
+of the rotation. The timer stops while the tab is hidden. Only the first
+picture is fetched at high priority — it is the one that paints.
 
-A plain `<img class="hero__poster">` sits underneath the `<video>` and is what
-actually paints — the LCP candidate — so the frame is never blank while the
-video loads or if autoplay is blocked. `src/js/landing.js` fades the video in
-(`.is-playing`) only once the `playing` event actually fires, and retries
-`play()` on the first tap/click/key if autoplay was blocked (iOS Low Power Mode
-and similar states block it silently, with no event and no way to detect it in
-advance). Holding the video transparent until then also keeps WebKit's own "tap
-to play" button — shadow DOM a page is no longer allowed to style away —
-invisible along with the rest of the element.
+**The scroll cue is the text itself.** The hero is one screen less a sliver,
+so the bottom edge of the first screen cuts the studio text's first line about
+a third of the way down its capitals. NN/g's research on the “illusion of
+completeness” found that a full-screen hero ending on a clean edge reads as
+the whole page — a false floor — and that real content visibly crossing the
+fold is the strongest cue that a page goes on, stronger than arrows or a
+“scroll” label, and with no extra element on the page. The hero's height is
+computed from the studio text's size and the white above its first line
+(`--studio-size` and `--studio-top` on `<main>`; `studio.js` sets the size), so
+the cut lands in the same place on every screen; the fraction is the
+`0.714 / 3` in `.hero` in `home.css`.
 
-The ring's hand-printed texture degrades rather than failing closed. Its
-filter chain ends in `feComponentTransfer` with `slope 18 / intercept -7`,
-which maps an empty input straight to fully transparent — so if any earlier
-step fails, the ring disappears entirely instead of merely losing its texture.
-The step that fails in practice is `canvas.toDataURL()` after drawing the noise
-SVG blob, which some WebKit versions refuse on a tainted canvas. `marquee.js`
-therefore bakes the noise first and only then sets `data-textured` on the SVG;
-the CSS applies `filter: url(#handPrintedRing)` under that attribute alone. A
-failure now costs the texture and keeps the text.
+### Landing: the marquee
 
-Note that neither the video nor the marquee ring stops under
-`prefers-reduced-motion`. That is inherited from this page's original design and
-is recorded as deliberate in the comment above `tick()` in `src/js/marquee.js`:
-ambient motion the page wants running unconditionally. Flip it if that stance
-ever changes.
+The old frame-ring, straightened: the studio's name running right to left
+through the middle of the picture, in the site's purple, with the same
+hand-printed texture filter. It is set in **Helvetica Neue bold**, as in the
+mockup. The ring asked for Arial Black, but iOS has no Arial Black, so on an
+iPhone it always fell back to Helvetica — the mockup simply shows what a phone
+rendered.
 
-`.hero__scrim` is the original gradient along the top only — it carries the
-ring text where it crosses the sky and reaches nothing else. The exhibition link
-does not depend on it: it sits on a white card (see Notes), which is what makes
-it readable over a night shot without darkening the video at all.
+How it moves is new. `marquee.js` fills an SVG with two identical halves, each
+at least a viewport wide, and a CSS animation slides the whole track left by
+exactly one half, then starts over — every letter lands where the same letter
+one half on stood, so there is no seam. Because that is a `transform` on a
+composited layer, the text and its filter are painted **once per layout**, not
+once per frame. The ring had to rewrite `startOffset` on every frame, which
+re-ran the filter each time; that is why it was capped at 30 fps and why its
+noise had to be pre-baked into a bitmap. Neither is needed any more.
 
-### Drifting rugs
+Two details keep the loop exact:
 
-The exhibition page floats three rugs behind the menu, drifting on one rAF loop
-and draggable with pointer events so it works on touch. Drift resumes from
-wherever you let go. Purely decorative — nothing is reachable only by dragging —
-and it stops entirely under `prefers-reduced-motion` and while the tab is hidden.
+- **The lengths come from glyph positions** (`getStartPositionOfChar`), not
+  `getComputedTextLength()`. WebKit leaves letter-spacing out of the latter but
+  not out of what it draws, so on an iPhone the computed length overstates each
+  unit by 27 × 0.01em, and the loop jumped by the difference every time round.
+- **The texture repeats with the text.** The filter's noise is generated for
+  one half only (`feTurbulence stitchTiles="stitch"`) and tiled across both
+  (`feTile`), so the textured glyphs are identical at the start and the end of a
+  loop.
 
-The rugs carry the reference artwork's Gaussian softener: a blurred copy of the
-layer blended back over the original, Normal mode at 47% opacity. `SOFTEN` at
-the top of the rug section in `scripts/build-images.mjs` is the only knob;
-`sigma: 5` is a slight softening, `10` turns it into a pronounced glow. It is
-baked into the WebP at build time rather than applied as a CSS `filter`, because
-the rugs move and a runtime blur would re-rasterise a large element every frame.
+The texture is still switched on only after `marquee.js` has sized the filter
+(`data-textured`): the chain ends in an alpha threshold (`slope 18 / intercept
+-7`) that maps an empty input to fully transparent, so a filter with no region
+would take the text with it rather than just its texture.
 
-Each rug is resized to leave a transparent margin before blurring, because the
-feather needs somewhere to fade into. The blend runs on premultiplied pixels:
-blurring straight RGBA drags the black of fully transparent pixels in under the
-edge and rings every rug with a dark halo.
+Pace is 3.6 em/s, the ring's old 60 px/s at the mockup's type size, so it reads
+the same at every size. Like the ring, it runs regardless of
+`prefers-reduced-motion` — ambient motion the site wants running
+unconditionally. Flip it in `marquee.js` and the `data-running` rule in
+`home.css` if that stance changes.
+
+### The studio text
+
+Below the picture, the text that used to sit behind “The Studio” in the old
+menu, set to fill **exactly one screen** — from under the header strip to the
+bottom edge. The text's height grows with the square of its size, so no single
+CSS formula fits every phone; `home.css` makes a close first guess
+(`min(7.15vw, 4.17svh)` in portrait), and `studio.js` measures the real text
+and bisects to the largest size that fits. It measures against `100svh` — the
+screen with Safari's toolbars showing — so the size does not change when the
+toolbars collapse as the reader scrolls into it. The section is below the
+fold, so the correction is never seen.
+
+The photograph from the opening (`about.jpg`) follows the text, **centred**,
+one line of the text's leading below it, and a little narrower than the
+picture at the top (`min(40vw, 32svh)` against the hero's `min(51vw, 41svh)`):
+the page opens and closes on a centred photograph without the two competing.
+It is not part of the screen the text fills.
+
+It was floated into the text, then set into the middle of it with the words
+running past on both sides (a script cut a matching gap into each line); both
+were tried on a phone and dropped in favour of this.
+
+### Menu
+
+Two lines at the **top right**: 28 px wide, 2 px thick and 4.5 px apart on a
+375 px phone, 22.5 px down from the top and in line with the right edge of the
+text column. The mockup drew them at 21 px, 12 px from the corner, which on a
+phone was both tiny and as far up as the screen goes. The button runs from the
+lines all the way into the corner — about 53 px square on a 390 px phone — so
+a tap that falls a little short of them still lands; to the left it stops
+halfway to the menu, so the links keep their own ends. Open, they close the gap and then
+turn into an X with a slight overshoot; closing runs the same two moves
+backwards. Each state carries the timing for the transition *into* it, so CSS
+reverses the order without any script. The links — the mockup's regular
+Helvetica, 25.6 px on a 375 px phone — come in from the right, staggered, with
+their first line's cap tops level with the burger's upper line.
+
+A bottom-right placement was built and tried on a phone first, for thumb
+reach: one-handed use is about half of all phone use, about three quarters of
+taps are made with the thumb, and the top corners are the hardest place on the
+screen to reach (Steven Hoober's field study; NN/g). It went back to the top:
+the mockup's position is the decision. Don't move it down again without asking.
+
+The header is fixed and paints a white strip, invisible over the white landing
+page and what keeps the burger off the type everywhere else. Type scrolling up
+under it is cut off at a **hard edge**, with no fade. Open, the strip grows to
+sit behind the links, so they never land on text either; it takes taps like
+the paper it looks like, so nothing under it can be hit through it and a tap on
+it beside the links closes the menu. On the subpages it also holds the home
+link, STUDIO KOLCHINA & GORDON in the marquee's letter, which steps aside while
+the menu is open. Without JavaScript the links are simply shown — which is the
+mockup's state anyway.
+
+Safari 26 reads the background of fixed elements near the screen's edges to
+tint its own toolbars, so the white of the strip is painted by a
+pseudo-element, never by the fixed element itself, and `html` and `body` both
+carry an explicit white.
+
+### Colour
+
+`#b26dd4`, sampled from the mockup, for everything large: the menu, the
+marquee, headings, the studio text. On white it is 3.5:1, which passes AA for
+large text (24 px and up) only, so small print — the Impressum, the privacy
+policy, credits, the footer — uses `#a14dcb`, the same hue darkened to 4.7:1.
+Running text that has to stay in the mockup purple, like the project
+descriptions, is set at 24 px or larger for the same reason.
 
 ### Icons
 
-The Zwischentöne mark is a single-line wordmark at roughly 6.8:1. Squeezed into
-a 32 px favicon it is four pixels tall and unreadable. `build:icons` used to cut
-the icons down to the mark's own leading **Z**, scanned out of the artwork
-rather than redrawn; that was dropped in favour of a flat `#37161d` tile, which
-reads better at every size a tab or a home screen actually renders and cannot be
-misread at any of them. The icons are now generated as solid squares — no SVG
-rasterisation, no glyph isolation.
+Flat `#b26dd4` tiles. Any wordmark squeezed into a 32 px favicon is a few
+pixels tall and unreadable; the flat colour reads at every size a tab or a home
+screen renders.
 
 ### Social preview image
 
-The OG/Twitter card is a photo of the shopfront window, not a screenshot of the
-live page. `build:og` crops `src/assets/preview2.jpg` (1350×602) to the standard
-1200×630 card size with `sharp`'s `cover` fit, writes `og-image.<hash>.jpg`, and
-then re-runs `build:html` so the meta tags pick up the new filename. Replace
-`src/assets/preview2.jpg` and re-run `npm run build:og` to update it.
+`build:og` composes the 1200×630 card rather than screenshotting the page:
+`hero-1` on white with the studio's name running across its middle in purple —
+the landing page in miniature. The type is rendered by librsvg through
+fontconfig, so it is set in whatever the build machine resolves “Helvetica
+Neue” to; on a Mac, the real thing.
 
-## Replacing assets
+## Legal
 
-Drop the new file into `src/assets/` under the same name and run `npm run build`.
-For the landing video, re-encode it yourself first (see Landing video above) — the
-build only hashes and copies whatever is in `src/assets/video/ledder.mp4`, it
-does not compress it.
+The **Impressum** is on the contact page (`/contact.html#impressum`), reached
+from the menu (Contact) or from the footer link on every page. The old
+`/imprint.html` redirects there. The **Datenschutzerklärung** stays its own
+page, linked from the footer and from the Impressum.
 
-If `Zwischentöne_vector.svg` is ever missing, the build warns, renders the
-top-left mark as live text and falls back to the Studio wordmark for icons.
+The operator is Galina Kolchina, Eisenbahnstraße 5, 10997 Berlin,
++49 152 21465761. The provider-identification heading cites **§ 5 DDG**: the
+Digitale-Dienste-Gesetz replaced the TMG in May 2024. The liability paragraphs
+below it still cite §§ 7–10 TMG as they were written; both documents are
+standard German boilerplate and a starting point, not legal advice — have them
+reviewed.
 
-Source SVGs may keep their exported `fill`/`stroke` attributes; the build strips
-them so the marks take their colour from CSS.
+The privacy policy promises no cookies, no local or session storage and no
+third-party requests. None of the scripts store anything, and the
+Content-Security-Policy in `netlify.toml` is what actually enforces the rest.
 
-## Legal pages
+## Redirects
 
-The imprint and privacy policy carry the operator's details: Galina Kolchina,
-Eisenbahnstraße 5, 10997 Berlin, +49 152 21465761. No placeholders remain, and
-the VAT-ID section has been removed.
+`netlify.toml` sends the retired URLs, which are on printed flyers and in
+shared links, to where their content lives now:
 
-Both documents are standard German boilerplate (§ 5 TMG, GDPR). They are a
-starting point, not legal advice; have them reviewed.
-
-The `<mark>` styling in `src/css/main.css` is kept for any detail that later
-needs flagging as unfilled — it renders loudly on purpose.
+| from | to |
+|---|---|
+| `/zwischentoene.html`, `/zwischentoene` | `/previous-projects.html#zwischentoene` |
+| `/imprint.html`, `/imprint` | `/contact.html#impressum` |
 
 ## Deployment
 
 Netlify, publish directory `public/`, no build command. `netlify.toml` sets the
 cache headers — a year and `immutable` for the hashed `/assets/*`, revalidate
-for HTML — plus a Content-Security-Policy strict enough to enforce the claim the
-privacy policy makes: this site loads nothing from anyone else.
+for HTML — the redirects above, and a Content-Security-Policy strict enough to
+enforce the claim the privacy policy makes: this site loads nothing from anyone
+else.
 
 ## Performance
 
-Transfer per page, as a phone fetches it (narrowest `srcset` candidate, critical
-CSS inlined, measured from the built files in `public/`):
+Measured on an iPhone 14 viewport (390×664 at 3×), every request the page
+makes including lazy images, before compression:
 
 | | requests | transfer |
 |---|---|---|
-| `/` (landing) | 5 | 2.16 MB |
-| `/zwischentoene.html` | 7 | **41 KB** |
+| `/` | 10 | 245 KB |
+| `/on-view.html` | 3 | 13 KB |
+| `/previous-projects.html` | 6 | 164 KB |
+| `/contact.html` | 3 | 18 KB |
 
-**Splitting the two screens is what makes the exhibition page cheap.** It used
-to carry the video and came in around 1.5 MB; with the video living only on the
-landing page, everything the exhibition needs — markup, critical CSS, the
-deferred stylesheet, the menu and rug script, the woven background and all three
-rugs — adds up to 41 KB.
+The landing page used to be 2.16 MB, nearly all of it the shopfront video.
+Now the largest single file is the graffiti shopfront (`hero2`, 106 KB at
+720w) — busy detail is what WebP spends bytes on. The opening photograph in
+the studio text is lazy-loaded, so it is not part of the first screen.
 
-The landing page is the expensive one, and it is nearly all video: 2.1 MB of its
-2.16 MB. That is an explicit trade for the full-bleed shopfront, made with the
-cost known — the night footage was budgeted at `crf 30` against measured
-alternatives of ~2.2 MB (`crf 34`, mushy shadows) and ~8.4 MB (`crf 26`).
-Everything else on the page is under 40 KB. The poster is preloaded at
-`fetchpriority="high"` and is the LCP candidate, so the first paint does not
-wait on the video — and with no loading screen in front of it any more, nothing
-covers the viewport while it arrives.
+## Archive
 
-The LCP figures that used to sit here were measured against the previous
-single-page build with its 1.5 s loading screen, so they no longer describe this
-site and have been dropped rather than carried over. If the number matters,
-re-measure it.
+The Zwischentöne exhibition site — landing video, frame ring, woven
+background, drifting rugs — is tagged:
 
-If the video's bytes ever need trimming: it is currently `crf 30` over a 24.8 s
-cut. Raising the crf, shortening the cut further, or capping its width would all
-help, at some cost to how it reads on a large desktop screen where `cover`
-scales it up — and night footage shows compression artefacts in the shadows
-much sooner than daylight did.
+```bash
+git checkout zwischentoene-archive   # look around; `git checkout main` to return
+```
 
-## Notes
-
-- There is no loading screen. It was removed when the landing page became the
-  site's entrance — a wordmark hold behind it would have repeated branding the
-  visitor had just walked through, and delayed the rugs by 2.1 s.
-- The intro text — what used to live behind an "About" toggle — is always
-  visible above the menu now, not a panel. It reads as the page's lead
-  statement; `.intro` in `src/css/main.css` shares its typography with
-  `.panel-body` so the two read as one voice.
-- The menu is The Studio · Artists · Brands · Contact, left-aligned, in the
-  source order of the `<li>` elements in `src/zwischentoene.html`. Its
-  font-size is derived from the mark rather than picked by eye — see the
-  comment on `.menu-toggle` in `src/css/main.css`.
-- **The menu is anchored to the top of its area, not centred.** `.shell > nav`
-  used `align-items: center`, which meant an opening panel grew the list in both
-  directions and shifted the whole menu up by 77–86px — the item you had just
-  tapped moved out from under your finger. With `flex-start` the toggles above
-  an open panel never move; only what is below it is pushed down, which is what
-  `scrollIntoView` in `main.js` already assumed.
-- **`.panel-body` is indented rather than relying on vertical space.** The
-  toggles are stacked tightly, so the gap above an open panel can never be
-  smaller than the gap between two closed items — space alone cannot say which
-  toggle the content belongs to. The step in from the left does.
-- The exhibition's opening hours live in two places that must be changed
-  together: the `.hours` block in `src/zwischentoene.html` and the
-  `eventSchedule` array in `scripts/build-html.mjs`. The schedule is two runs —
-  10–13 September daily 14:00–20:00, then 14–30 September Thursday to Saturday
-  15:00–19:00 — so `eventSchedule` is an array, not a single `Schedule`.
-- Body copy is left-aligned sitewide — the intro, every panel, and the legal
-  pages — at a larger, more editorial scale than the original centred design.
-  `.intro, .panel-body` in `src/css/main.css` is the shared type rule.
-- The exhibition runs 9–30 September 2026, Monday to Saturday 14:00–20:00,
-  closed Sundays. The dates, the venue and that schedule appear in the meta
-  description and in the `ExhibitionEvent` JSON-LD; changing them means editing
-  `src/zwischentoene.html` and the `exhibition` object in
-  `scripts/build-html.mjs`.
-- **The exhibition link is the wordmark itself, drawn as an outline.**
-  `src/index.html` pulls in `{{svg:zwischentoene}}` — the same mark the
-  exhibition page uses top-left — and `landing.css` overrides its
-  `fill="currentColor"` presentation attribute with `fill: none; stroke:
-  currentColor`, so the video reads through the letterforms. It sits on the
-  glass with no panel behind it, like vinyl on the shopfront window, which is
-  what the footage actually shows.
-
-  This replaced a solid cream plaque with a burgundy frame. That plaque was
-  legible (13.5:1) but it was the only hard-edged, high-contrast rectangle on a
-  page whose language is otherwise soft — a hand-printed ring, blurred rugs, a
-  night photograph — and it read as a UI component laid over the picture.
-
-  Two things keep it readable without a background. The footage is a night shot,
-  so cream sits well clear of it to begin with; and the `filter` on the SVG is
-  **two** drop-shadows, not one — a tight 2px dark edge hugging the stroke plus
-  a wide ambient halo. The tight one is load-bearing on desktop: there `cover`
-  crops the dark pavement away and the mark lands on the lit, graffitied
-  shutter, where a ~1px cream hairline on its own gets lost. Do not collapse
-  them into a single soft shadow.
-
-  `stroke-width` is in user units, so the outline scales with the letterforms
-  rather than thinning out as the viewport grows. The block sits at `top: 78%`,
-  which puts it on the paving stones on a portrait phone.
-
-  The dates sit **under** the mark and ranged right, hung past it by a negative
-  right margin so the line finishes just after the final "e" rather than flush
-  with it — a slight overhang reads as deliberate where an exact alignment looks
-  like a near miss. The margin is in `em`, so it tracks the date's own size:
-  16.5px of overhang at every viewport from 500px up, easing down only once the
-  font-size clamp starts to bite. They also follow the link in source order, so
-  the reading order matches the screen.
-
-  The SVG is inlined, which takes `index.html` from 7.8 KB to 16.7 KB. That is
-  nothing against a 2.1 MB video and it costs no extra request, but it is why
-  the landing document is larger than the exhibition one.
-- Body copy is left-aligned sitewide — the intro, every panel, and the legal
-  pages — at a larger, more editorial scale than the original centred design.
-  `.intro, .panel-body` in `src/css/main.css` is the shared type rule.
-- The exhibition runs 9–30 September 2026, Monday to Saturday 14:00–20:00,
-  closed Sundays. The dates, the venue and that schedule appear in the meta
-  description and in the `ExhibitionEvent` JSON-LD; changing them means editing
-  `src/zwischentoene.html` and the `exhibition` object in
-  `scripts/build-html.mjs`.
-- **The exhibition link sits on a framed plaque, and that is what makes it
-  readable.** It is set in the site's burgundy (`#37161d`), which is close to
-  black; the landing video is a night shot, and no scrim is wanted over it.
-  Measured directly against the footage the type came out near 1:1 — invisible.
-  On the plaque's cream field (`#efeae1`) the same burgundy measures
-  **13.5:1**, comfortably past AAA, and the video behind it is left completely
-  untouched. This is why `.hero__footer` has a background at all; it is not
-  decoration.
-
-  The frame is two rules — a thick border and a keyline set inside it — both
-  driven off one `--frame` custom property, so they cannot drift apart. The
-  plaque sits at `top: 78%`, over the pavement on a portrait phone; on a wide
-  viewport `cover` has already cropped the pavement away and it simply reads as
-  the lower quarter of the picture.
-
-  The card is `width: max-content` rather than the default shrink-to-fit,
-  because an auto-width absolutely positioned box at `left: 50%` is only
-  offered half the viewport — the centring transform does not feed back into
-  layout — which wrapped the label onto two lines on a phone.
-- Body copy on the exhibition page sits over the burgundy ground and the rugs,
-  not over video, so it is not subject to the above.
+Its source assets were removed from `src/assets/` in the same change and are in
+that tag. The camera master of the landing video (`ledder2.MOV`, 781 MB, never
+committed) was moved to `Zwischentöne/archived assets/` in the project folder.

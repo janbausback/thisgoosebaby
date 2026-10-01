@@ -1,14 +1,16 @@
 {
-  "name": "Zwischentöne — Studio Kolchina & Gordon",
-  "short_name": "Zwischentöne",
+  "name": "Studio Kolchina & Gordon",
+  "short_name": "Kolchina & Gordon",
+  "description": "An art studio and collaborative project in Berlin, working at the intersection of art, design and science.",
+  "lang": "en",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#37161d",
-  "theme_color": "#37161d",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
-    { "src": "/assets/icon-192.b9109cf2.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/assets/icon-512.bff79252.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/assets/icon-512-maskable.bff79252.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/assets/icon-192.6d53cb57.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512.655de2f6.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512-maskable.655de2f6.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

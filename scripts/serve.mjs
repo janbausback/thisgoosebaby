@@ -1,7 +1,13 @@
 #!/usr/bin/env node
-/** Minimal static server for public/ — local preview only, no dependencies. */
+/**
+ * Minimal static server for public/ — local preview only, no dependencies.
+ * Listens on every interface, so a phone on the same Wi-Fi can open the LAN
+ * address it prints. macOS may ask once whether node may accept incoming
+ * connections; allow it, or the phone will time out.
+ */
 import http from 'node:http';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { PUBLIC } from './lib/manifest.mjs';
 
@@ -71,6 +77,17 @@ export function createServer() {
   });
 }
 
+/** IPv4 addresses this machine can be reached at on the local network. */
+export function lanAddresses() {
+  return Object.values(os.networkInterfaces())
+    .flat()
+    .filter((a) => a && a.family === 'IPv4' && !a.internal)
+    .map((a) => a.address);
+}
+
 if (import.meta.filename === process.argv[1]) {
-  createServer().listen(PORT, () => console.log(`→ http://localhost:${PORT}`));
+  createServer().listen(PORT, () => {
+    console.log(`→ http://localhost:${PORT}`);
+    for (const ip of lanAddresses()) console.log(`→ http://${ip}:${PORT}   (phone, same Wi-Fi)`);
+  });
 }

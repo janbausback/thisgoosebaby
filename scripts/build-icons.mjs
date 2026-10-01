@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 /**
- * Favicons: the site's burgundy, and nothing else.
+ * Favicons: the site's purple, and nothing else.
  *
- * The mark is a single-line wordmark at roughly 6.8:1 — squeezed into a 32 px
- * tile it is four pixels tall and unreadable. Cutting it down to its leading Z
- * was tried and dropped; the flat tile reads better at every size a tab or a
- * home screen actually renders, and it cannot be misread at any of them.
+ * A flat tile, as it was in the Zwischentöne burgundy. Any wordmark squeezed
+ * into a 32 px tile is a few pixels tall and unreadable; the flat colour reads
+ * at every size a tab or a home screen actually renders, and it cannot be
+ * misread at any of them.
  */
 import sharp from 'sharp';
 import fs from 'node:fs';
 import path from 'node:path';
 import { PUBLIC, writeHashed, mergeManifest, kb } from './lib/manifest.mjs';
 
-const BG = '#37161d';
-const RGB = { r: 0x37, g: 0x16, b: 0x1d, alpha: 1 };
+const BG = '#b26dd4';
+const RGB = { r: 0xb2, g: 0x6d, b: 0xd4, alpha: 1 };
 
 const png = (size) =>
   sharp({ create: { width: size, height: size, channels: 4, background: RGB } })

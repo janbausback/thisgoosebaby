@@ -3,6 +3,30 @@
   publish = "public"
   command = ""
 
+# Retired URLs. The exhibition page and the separate imprint went when the
+# site became the studio's own; the old addresses are on printed flyers and in
+# shared links, so they land on where that content lives now. Netlify also
+# serves pages without their .html, hence both spellings.
+[[redirects]]
+  from = "/zwischentoene.html"
+  to = "/previous-projects.html#zwischentoene"
+  status = 301
+
+[[redirects]]
+  from = "/zwischentoene"
+  to = "/previous-projects.html#zwischentoene"
+  status = 301
+
+[[redirects]]
+  from = "/imprint.html"
+  to = "/contact.html#impressum"
+  status = 301
+
+[[redirects]]
+  from = "/imprint"
+  to = "/contact.html#impressum"
+  status = 301
+
 # Filenames under /assets/ carry a content hash, so they can never go stale.
 [[headers]]
   for = "/assets/*"

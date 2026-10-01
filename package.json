@@ -1,13 +1,14 @@
 {
-  "name": "zwischentoene",
-  "version": "1.0.0",
-  "description": "Zwischentöne — a temporary installation by Clara Twele and Galina Kolchina. Studio Kolchina & Gordon.",
+  "name": "kolchinagordon",
+  "version": "2.0.0",
+  "description": "Studio Kolchina & Gordon — an art studio and collaborative project in Berlin. Website: kolchinagordon.com.",
   "scripts": {
-    "build": "npm run build:images && npm run build:icons && npm run build:html",
+    "build": "npm run build:images && npm run build:og:image && npm run build:icons && npm run build:html",
     "build:images": "node scripts/build-images.mjs",
     "build:icons": "node scripts/build-icons.mjs",
     "build:html": "node scripts/build-html.mjs",
-    "build:og": "node scripts/build-og.mjs && npm run build:html",
+    "build:og": "npm run build:og:image && npm run build:html",
+    "build:og:image": "node scripts/build-og.mjs",
     "serve": "node scripts/serve.mjs",
     "start": "npm run serve"
   },

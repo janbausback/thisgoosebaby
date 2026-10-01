@@ -1,0 +1,161 @@
+/* Subpages: On View, Previous Projects, Contact, and the privacy policy. */
+
+.main {
+  max-width: 90rem;
+  padding: calc(var(--bar) + clamp(1.5rem, 9vw, 5rem)) var(--gutter) clamp(3rem, 12vw, 7rem);
+}
+
+/* The page's own name, at the size of the menu item that led here. */
+.page-title {
+  margin: 0 0 clamp(1.75rem, 8vw, 3.5rem);
+  font-size: var(--menu-size);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+}
+
+/* Statement type: the On View line and the project titles. */
+.display {
+  margin: 0;
+  font-size: clamp(2.5rem, 12vw, 7.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+/* Running text set large enough (24px+) to carry the mockup's purple at AA. */
+.lead {
+  max-width: 30em;
+  font-size: clamp(1.5rem, 6.4vw, 2.25rem);
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+}
+
+.lead p { margin: 0; }
+.lead p + p { margin-top: 0.6em; }
+
+/* Small print: credits, the Impressum, the privacy policy. The deeper purple
+   is what keeps this at 4.7:1. */
+.small {
+  max-width: 42rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+}
+
+.small p, .small ul, .small address { margin: 0 0 0.9rem; }
+.small ul { padding-left: 1.1rem; }
+.small address { font-style: normal; }
+
+.small :is(h2, h3) {
+  margin: 2.25rem 0 0.45rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+.main a {
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.16em;
+}
+
+.small a { text-decoration-thickness: 1px; }
+
+@media (hover: hover) {
+  .main a:hover { opacity: 0.6; }
+}
+
+/* ── On View ──────────────────────────────────────────────────────────────── */
+
+/* Tall enough that the line sits in the middle of the first screen, with
+   the footer just below. */
+.on-view {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - 5rem);
+}
+
+/* Centred in whatever height is left under the title. */
+.on-view .display {
+  max-width: 9.5em;
+  margin-block: auto;
+  padding-bottom: clamp(1rem, 8vh, 5rem);
+}
+
+/* ── Previous Projects ──────────────────────────────────────────────────── */
+
+.project { scroll-margin-top: calc(var(--bar) + 1rem); }
+
+.project + .project { margin-top: clamp(4rem, 16vw, 9rem); }
+
+.project__meta {
+  margin: 0.55em 0 0;
+  font-size: var(--menu-size);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.project__images {
+  display: grid;
+  gap: clamp(0.5rem, 1.5vw, 1rem);
+  margin: clamp(1.75rem, 7vw, 3.5rem) 0;
+}
+
+@media (min-width: 48em) {
+  .project__images { grid-template-columns: repeat(3, 1fr); }
+}
+
+.project__images img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background: #f3eff5;
+}
+
+.credits {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1.25rem;
+  margin: clamp(2rem, 8vw, 3.5rem) 0 0;
+}
+
+.credits dt { font-weight: 700; }
+.credits dd { margin: 0; }
+
+/* ── Contact ────────────────────────────────────────────────────────────── */
+
+.contact {
+  font-size: var(--menu-size);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.contact p, .contact address { margin: 0 0 1em; font-style: normal; }
+
+.socials {
+  display: grid;
+  gap: 0.3em;
+  justify-items: start;
+  margin: 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+
+.social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.social svg { flex: none; width: 0.8em; height: 0.8em; }
+
+.impressum {
+  margin-top: clamp(3.5rem, 14vw, 7rem);
+  scroll-margin-top: calc(var(--bar) + 1rem);
+}
+
+.impressum .page-title { margin-bottom: 0.4em; }
+
+.credit { margin-top: 3rem; }

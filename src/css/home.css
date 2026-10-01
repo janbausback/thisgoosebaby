@@ -1,0 +1,150 @@
+/* Landing (`/`): one picture in the middle with the studio's name running
+   across it, then the studio text, set big enough to fill a phone screen. */
+
+/* The size of the studio text. The hero needs it too — its height is what
+   lets the text's first line peek in — so it lives on <main> rather than on
+   the text. studio.js overwrites it, inline, with the measured fit; this is
+   its first guess and the size without script.
+
+   The text's height goes with the square of its size over the column width,
+   so the size that fills a screen is roughly the geometric mean of the
+   screen's two sides. min() of a width term and a height term never
+   overshoots that, and on a portrait phone — 7.15vw against 4.17svh, fitted
+   to Helvetica Neue — lands within a few percent of it. A landscape screen
+   is far from the diagonal, so it gets its own pair. */
+/* --studio-top is the white above the text's first line: the header strip,
+   and a little air. The hero needs it as well, for the same reason. */
+.home {
+  --studio-size: min(7.15vw, 4.17svh);
+  --studio-top: calc(var(--bar) + 0.25rem);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .home { --studio-size: min(4.3vw, 6.9svh); }
+}
+
+/* One screen less a sliver: the bottom edge of the first screen cuts the
+   studio text's first line a third of the way down its capitals. Real
+   content crossing the fold is the strongest cue there is that a page goes
+   on (NN/g, “The Illusion of Completeness”); a hero that ends on a clean
+   white edge reads as the whole page. 0.18em is where the capitals start in
+   the line, 0.714em / 3 a third of their height.
+
+   svh, not dvh: the hero must not resize when the phone's toolbar collapses
+   on the first scroll, or the picture would jump just as the reader moves. */
+.hero {
+  position: relative;
+  height: calc(100svh - var(--studio-top) - var(--studio-size) * (0.18 + 0.714 / 3));
+  min-height: 22rem;
+  overflow: hidden;
+}
+
+/* 51% of the width on a phone, as in the mockup. On a wide screen the height
+   governs instead, so the picture never outgrows the viewport. All three
+   sources are 3:4. */
+.hero__frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(51vw, 41svh);
+  aspect-ratio: 3 / 4;
+  transform: translate(-50%, -50%);
+  background: #f3eff5;
+}
+
+/* Hard cuts: the pictures are stacked and `is-active` swaps which one shows,
+   with no transition. slideshow.js only cuts to a picture once it has
+   decoded, so a cut never lands on a half-loaded frame. */
+.hero__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+
+.hero__img.is-active { opacity: 1; }
+
+/* ── Marquee ────────────────────────────────────────────────────────────────
+   One line through the middle of the picture. marquee.js fills the track with
+   two identical halves and the animation slides it left by exactly one half,
+   on the compositor: the text and its filter are painted once, not per frame.
+
+   Helvetica bold, as in the mockup — and as the ring always rendered on an
+   iPhone, which has no Arial Black. */
+.marquee {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  overflow: hidden;
+  pointer-events: none;
+  font-size: clamp(1rem, 4.4vw, 1.5rem);
+}
+
+/* 64em is the four repeats in the markup, the width it has without script;
+   marquee.js overrides it with the exact length of what it builds. */
+.marquee__track {
+  display: block;
+  width: 64em;
+  max-width: none;
+  height: 1.5em;
+  overflow: visible;
+}
+
+.marquee[data-running] .marquee__track {
+  animation: marquee-run 20s linear infinite;
+  will-change: transform;
+}
+
+@keyframes marquee-run {
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.marquee__text {
+  fill: var(--purple);
+  font-family: var(--font);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* The hand-printed texture goes on only once marquee.js has sized the filter.
+   Its chain ends in an alpha threshold that maps an empty input to fully
+   transparent, so a filter applied before it has a region would take the
+   text with it rather than just its texture. */
+.marquee[data-textured] .marquee__text { filter: url(#handPrinted); }
+
+/* ── The Studio ─────────────────────────────────────────────────────────────
+   Exactly one screen of type, from under the header strip to the bottom
+   edge, sized by --studio-size (see .home above); svh, so the type does not
+   change size while it is being read. The photograph follows it. */
+.studio {
+  min-height: 100svh;
+  padding: var(--studio-top) var(--gutter) var(--gutter);
+}
+
+.studio__text {
+  max-width: 90rem;
+  margin: 0;
+  font-size: var(--studio-size);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-align: justify;
+  text-justify: auto;
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+.studio__text + .studio__text { margin-top: 0.55em; }
+
+/* The opening photograph, after the text, centred — a little narrower than
+   the picture at the top of the page (40vw against 51vw on a phone), so it
+   closes the page without competing with the opening. One line of the
+   text's own leading above it. */
+.studio__img {
+  width: min(40vw, 32svh);
+  height: auto;
+  margin: calc(var(--studio-size) * 1.04) auto 0;
+}

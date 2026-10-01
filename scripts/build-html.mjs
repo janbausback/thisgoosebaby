@@ -1,96 +1,46 @@
 #!/usr/bin/env node
 /**
- * Renders src/*.html into public/ — inlining the critical CSS and the SVGs,
- * and resolving every /assets/* URL to its content-hashed filename so the
- * whole directory can be served immutable.
+ * Renders src/*.html into public/ — inlining the CSS and SVGs, filling in the
+ * shared header and footer, and resolving every /assets/* URL to its
+ * content-hashed filename so the whole directory can be served immutable.
  *
- * Two screens, two shapes of page. `/` is the landing: the shopfront video and
- * the ring of studio text, with one link onward. `/zwischentoene.html` is the
- * exhibition: the drifting rugs and the menu. They share the type stack and
- * almost nothing else, so each gets its own inline critical block.
+ * Two shapes of page. `/` is the landing: the photographs in the middle, the
+ * marquee across them, the studio text below. Everything else is a plain
+ * subpage. Each gets only the CSS it paints, inlined, so no page waits on a
+ * stylesheet request.
+ *
+ * Runs last in `npm run build`, so it is also where stale assets are pruned:
+ * by now every step has written its entries into the manifest.
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { SRC, PUBLIC, writeHashed, readManifest, mergeManifest, kb } from './lib/manifest.mjs';
+import { SRC, PUBLIC, writeHashed, readManifest, mergeManifest, prune, kb } from './lib/manifest.mjs';
+
+const SITE = 'https://kolchinagordon.com';
+const PAGES = ['index.html', 'on-view.html', 'previous-projects.html', 'contact.html', 'privacy.html'];
 
 const manifest = readManifest();
 const warnings = [];
 
-/* ── SVG ──────────────────────────────────────────────────────────────────
-   Source files carry hard-coded fills and strokes from the export; strip them
-   so the mark takes its colour from CSS. Coordinates are rounded to one
-   decimal, which is well below a pixel at any size we render at. */
+/* ── SVG ────────────────────────────────────────────────────────────────── */
 
-function cleanSvg(raw, { viewBox } = {}) {
-  let s = raw
-    .replace(/<\?xml[\s\S]*?\?>/g, '')
-    .replace(/<!DOCTYPE[\s\S]*?>/gi, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<title>[\s\S]*?<\/title>/gi, '')
-    .replace(/<desc>[\s\S]*?<\/desc>/gi, '')
-    .replace(/\s(?:fill|stroke|stroke-width|stroke-linecap|stroke-linejoin|style)="[^"]*"/g, '')
-    .replace(/\sxmlns:[a-z]+="[^"]*"/g, '')
-    .replace(/\sversion="[^"]*"/g, '')
-    .replace(/\s(?:width|height)="[\d.]+(?:in|px|pt|mm|cm)?"/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+const svgs = {
+  instagram:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+    '<rect x="2.5" y="2.5" width="19" height="19" rx="5.4"/>' +
+    '<circle cx="12" cy="12" r="4.3"/>' +
+    '<circle cx="17.6" cy="6.4" r="1.15" fill="currentColor" stroke="none"/></svg>',
+};
 
-  s = s.replace(/-?\d+\.\d+/g, (n) => String(Math.round(parseFloat(n) * 10) / 10));
-
-  if (viewBox) s = s.replace(/viewBox="[^"]*"/, `viewBox="${viewBox}"`);
-  if (!/viewBox=/.test(s)) warnings.push('an SVG has no viewBox — it will not scale');
-
-  return s.replace(
-    /^<svg/,
-    '<svg fill="currentColor" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet"'
-  );
-}
-
-/** macOS writes filenames in NFD; a literal "ö" in source will not match. */
-function findAsset(re) {
-  const dir = path.join(SRC, 'assets');
-  const hit = fs.readdirSync(dir).find((f) => re.test(f.normalize('NFC')));
-  return hit ? path.join(dir, hit) : null;
-}
-
-const wordmarkFile = findAsset(/^studio kolchina & gordon\.svg$/i);
-const zwischenFile = findAsset(/^zwischent[öo]ne[_-]?vector\.svg$/i);
-
-const svgs = {};
-
-if (wordmarkFile) {
-  // The export leaves the artwork in the lower-right of a much larger canvas.
-  // Tightened to the ink bounds so the square can be sized from the wordmark.
-  svgs.wordmark = cleanSvg(fs.readFileSync(wordmarkFile, 'utf8'), { viewBox: '1585 824 1633 1055' });
-} else {
-  warnings.push('Studio Kolchina & Gordon.svg not found');
-  svgs.wordmark = '<svg viewBox="0 0 100 65" aria-hidden="true"></svg>';
-}
-
-if (zwischenFile) {
-  svgs.zwischentoene = cleanSvg(fs.readFileSync(zwischenFile, 'utf8'));
-} else {
-  warnings.push('Zwischentöne_vector.svg not found in src/assets — the top-left mark is\n' +
-    '  rendering as live text. Drop the SVG in and re-run `npm run build`.');
-  svgs.zwischentoene =
-    '<span class="mark-fallback" data-placeholder="Zwischentöne_vector.svg">Zwischentöne</span>';
-}
-
-svgs.instagram =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
-  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
-  '<rect x="2.5" y="2.5" width="19" height="19" rx="5.4"/>' +
-  '<circle cx="12" cy="12" r="4.3"/>' +
-  '<circle cx="17.6" cy="6.4" r="1.15" fill="currentColor" stroke="none"/></svg>';
-
-/* ── CSS and JS ───────────────────────────────────────────────────────────── */
+/* ── CSS and JS ─────────────────────────────────────────────────────────── */
 
 /**
  * Whitespace-only minification.
  *
  * Note which characters are NOT in the strip set: `:` most of all. Collapsing
- * the space around it rewrites `.shell :is(button, a)` — a descendant selector —
- * into `.shell:is(button, a)`, which matches nothing, and does it silently.
+ * the space around it rewrites `.small :is(h2, h3)` — a descendant selector —
+ * into `.small:is(h2, h3)`, which matches nothing, and does it silently.
  * The handful of bytes this leaves on the table disappear under Brotli anyway.
  */
 const squish = (css) =>
@@ -103,27 +53,12 @@ const squish = (css) =>
 
 const readCss = (f) => squish(fs.readFileSync(path.join(SRC, 'css', f), 'utf8'));
 
-const ogUrl = manifest.og?.src ?? '/assets/og-image.jpg';
-
-// The woven background, chosen by width in the inline block so no second
-// stylesheet round-trip is needed to know which file to fetch.
-const bgCss = manifest.bg
-  ? [
-      `:root{--bg-image:url("${manifest.bg.widths[480]}")}`,
-      `@media (min-width:481px),(min-resolution:1.5dppx){:root{--bg-image:url("${manifest.bg.widths[960]}")}}`,
-      `@media (min-width:1441px) and (min-resolution:1.5dppx){:root{--bg-image:url("${manifest.bg.widths[1440]}")}}`,
-    ].join('')
-  : ':root{--bg-image:none}';
-
 const base = readCss('critical.css');
-const CRITICAL = {
-  'index.html': base + readCss('landing.css'),
-  'zwischentoene.html': base + readCss('site.css') + bgCss,
-  'imprint.html': base + readCss('site.css') + bgCss,
-  'privacy.html': base + readCss('site.css') + bgCss,
-};
-
-const mainCss = writeHashed('main', 'css', Buffer.from(readCss('main.css')));
+const homeCss = readCss('home.css');
+const pageCss = readCss('page.css');
+const CRITICAL = Object.fromEntries(
+  PAGES.map((p) => [p, base + (p === 'index.html' ? homeCss : pageCss)])
+);
 
 // Every script in src/js is hashed and exposed as {{js:<basename>}}, so a page
 // pulls in only the behaviour it actually has.
@@ -133,40 +68,125 @@ for (const f of fs.readdirSync(path.join(SRC, 'js')).sort()) {
   js[f.replace(/\.js$/, '')] = writeHashed(f.replace(/\.js$/, ''), 'js', fs.readFileSync(path.join(SRC, 'js', f)));
 }
 
+/* ── Header and footer ──────────────────────────────────────────────────── */
+
+// The menu, in order. The current page is marked, not removed, so the list
+// reads the same from every page.
+const MENU = [
+  ['/on-view.html', 'On View'],
+  ['/previous-projects.html', 'Previous Projects'],
+  ['/contact.html', 'Contact'],
+];
+
+function header(page) {
+  // --i staggers the links in from the top down.
+  const items = MENU.map(([href, label], i) => {
+    const current = href === `/${page}` ? ' aria-current="page"' : '';
+    return `<li style="--i:${i}"><a href="${href}"${current}>${label}</a></li>`;
+  }).join('');
+  // On `/` the marquee already says the name; everywhere else it is the way home.
+  const home = page === 'index.html' ? '' : '<a class="top__home" href="/">Studio Kolchina &amp; Gordon</a>';
+  // The button comes before the links so focus moves from it into them; the
+  // CSS draws the links to its left.
+  return (
+    '<header class="top">' +
+    home +
+    '<button class="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menu">' +
+    '<span></span><span></span></button>' +
+    `<nav class="menu" id="menu" aria-label="Main"><ul>${items}</ul></nav>` +
+    '</header>'
+  );
+}
+
+// The imprint lives on the contact page now; this keeps it one tap from
+// anywhere, which is what § 5 DDG's "unmittelbar erreichbar" asks for.
+const FOOTER =
+  '<footer class="foot">' +
+  '<p>Studio Kolchina &amp; Gordon<span aria-hidden="true"> · </span><br class="foot__break">Eisenbahnstraße 5, 10997 Berlin</p>' +
+  '<nav aria-label="Legal"><a href="/contact.html#impressum">Impressum</a><a href="/privacy.html">Datenschutz</a></nav>' +
+  '</footer>';
+
+/* ── Social card ────────────────────────────────────────────────────────── */
+
+const ogUrl = manifest.og?.src ?? '/assets/og-image.jpg';
+const OG_ALT =
+  'A photograph of the studio on white, with “Studio Kolchina &amp; Gordon” running across it in purple.';
+
 /* ── JSON-LD ────────────────────────────────────────────────────────────── */
 
+const abs = (url) => `${SITE}${url}`;
 const day = (d) => `https://schema.org/${d}`;
 const ALL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day);
 const THU_SAT = ['Thursday', 'Friday', 'Saturday'].map(day);
 
-const organization = {
-  '@type': 'Organization',
-  '@id': 'https://kolchinagordon.com/#organization',
-  name: 'Studio Kolchina & Gordon',
-  url: 'https://kolchinagordon.com/',
-  email: 'hello@kolchinagordon.com',
-  telephone: '+4915221465761',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'Eisenbahnstraße 5',
-    postalCode: '10997',
-    addressLocality: 'Berlin',
-    addressCountry: 'DE',
-  },
+const address = {
+  '@type': 'PostalAddress',
+  streetAddress: 'Eisenbahnstraße 5',
+  postalCode: '10997',
+  addressLocality: 'Berlin',
+  addressRegion: 'Berlin',
+  addressCountry: 'DE',
 };
 
-const exhibition = {
+const organization = {
+  '@type': 'Organization',
+  '@id': `${SITE}/#organization`,
+  name: 'Studio Kolchina & Gordon',
+  url: `${SITE}/`,
+  description:
+    'An art studio and collaborative project based in Berlin, working at the intersection of art, design and science.',
+  email: 'hello@kolchinagordon.com',
+  telephone: '+4915221465761',
+  address,
+  founder: [
+    {
+      '@type': 'Person',
+      name: 'Galina Kolchina',
+      jobTitle: 'Visual artist and curator',
+      sameAs: 'https://www.instagram.com/_kolchina_/',
+    },
+    {
+      '@type': 'Person',
+      name: 'Liam Gordon',
+      jobTitle: 'Composer and musician',
+      sameAs: 'https://www.instagram.com/liamgordon__/',
+    },
+  ],
+  image: abs(ogUrl),
+};
+
+const website = {
+  '@type': 'WebSite',
+  '@id': `${SITE}/#website`,
+  url: `${SITE}/`,
+  name: 'Studio Kolchina & Gordon',
+  inLanguage: 'en',
+  publisher: { '@id': organization['@id'] },
+};
+
+const webPage = (type, file, name) => ({
+  '@type': type,
+  '@id': `${SITE}/${file}`,
+  url: `${SITE}/${file}`,
+  name,
+  inLanguage: 'en',
+  isPartOf: { '@id': website['@id'] },
+  about: { '@id': organization['@id'] },
+});
+
+// The exhibition is over, but it ran as scheduled, so EventScheduled stands;
+// the dates are what say it is past. Two runs of hours, hence two Schedules:
+// the opening days were daily and longer, the rest of the month Thursday to
+// Saturday, shorter.
+const zwischentoene = {
   '@type': 'ExhibitionEvent',
-  '@id': 'https://kolchinagordon.com/#exhibition',
+  '@id': `${SITE}/previous-projects.html#zwischentoene`,
   name: 'Zwischentöne',
   description:
-    'A temporary installation by Clara Twele and Galina Kolchina at the intersection of design, art and architecture. Open 10–13 September 14:00–20:00, then Thursdays to Saturdays 15:00–19:00 until 30 September.',
+    'A temporary installation by Clara Twele and Galina Kolchina at the intersection of design, art and architecture, held together by a soundscape.',
   startDate: '2026-09-09T14:00:00+02:00',
   endDate: '2026-09-30T19:00:00+02:00',
   eventStatus: 'https://schema.org/EventScheduled',
-  // Two runs of hours, so this is an array: the opening days are daily and
-  // longer, and the rest of the month is Thursday to Saturday, shorter. Keep
-  // both in step with the .hours block in src/zwischentoene.html.
   eventSchedule: [
     {
       '@type': 'Schedule',
@@ -192,46 +212,33 @@ const exhibition = {
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   inLanguage: 'en',
   isAccessibleForFree: true,
-  image: [`https://kolchinagordon.com${ogUrl}`],
-  url: 'https://kolchinagordon.com/zwischentoene.html',
-  location: {
-    '@type': 'Place',
-    name: 'Eisenbahnstraße 5',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Eisenbahnstraße 5',
-      postalCode: '10997',
-      addressLocality: 'Berlin',
-      addressRegion: 'Berlin',
-      addressCountry: 'DE',
-    },
-  },
-  organizer: { '@id': 'https://kolchinagordon.com/#organization' },
+  image: ['zw1', 'zw2', 'zw3'].filter((k) => manifest[k]).map((k) => abs(manifest[k].src)),
+  url: `${SITE}/previous-projects.html#zwischentoene`,
+  location: { '@type': 'Place', name: 'Studio Kolchina & Gordon', address },
+  organizer: { '@id': organization['@id'] },
   performer: [
     { '@type': 'Person', name: 'Clara Twele' },
     { '@type': 'Person', name: 'Galina Kolchina' },
   ],
 };
 
+const graph = (...nodes) => ({ '@context': 'https://schema.org', '@graph': nodes });
+
 const JSONLD = {
-  'index.html': {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebSite',
-        '@id': 'https://kolchinagordon.com/#website',
-        url: 'https://kolchinagordon.com/',
-        name: 'Studio Kolchina & Gordon',
-        inLanguage: 'en',
-        publisher: { '@id': 'https://kolchinagordon.com/#organization' },
-      },
-      organization,
-    ],
-  },
-  'zwischentoene.html': { '@context': 'https://schema.org', '@graph': [exhibition, organization] },
+  'index.html': graph(website, organization),
+  'on-view.html': graph(webPage('WebPage', 'on-view.html', 'On View'), organization),
+  'previous-projects.html': graph(
+    { ...webPage('CollectionPage', 'previous-projects.html', 'Previous Projects'), hasPart: { '@id': zwischentoene['@id'] } },
+    zwischentoene,
+    organization
+  ),
+  'contact.html': graph(
+    { ...webPage('ContactPage', 'contact.html', 'Contact'), mainEntity: { '@id': organization['@id'] } },
+    organization
+  ),
 };
 
-/* ── Token replacement ────────────────────────────────────────────────────── */
+/* ── Token replacement ──────────────────────────────────────────────────── */
 
 function render(html, page) {
   return html.replace(/\{\{([a-z]+):?([a-zA-Z0-9_-]*)\}\}/g, (whole, kind, name) => {
@@ -241,7 +248,8 @@ function render(html, page) {
         if (!css) { warnings.push(`no critical CSS mapped for ${page}`); return ''; }
         return css;
       }
-      case 'css': return mainCss.url;
+      case 'header': return header(page);
+      case 'footer': return FOOTER;
       case 'js': {
         if (!js[name]) { warnings.push(`unknown script: ${whole} in ${page}`); return ''; }
         return js[name].url;
@@ -250,7 +258,7 @@ function render(html, page) {
         if (!svgs[name]) { warnings.push(`unknown svg token: ${whole}`); return ''; }
         return svgs[name];
       }
-      case 'og': return ogUrl;
+      case 'og': return name === 'alt' ? OG_ALT : ogUrl;
       case 'jsonld': {
         if (!JSONLD[page]) { warnings.push(`no JSON-LD mapped for ${page}`); return '{}'; }
         return JSON.stringify(JSONLD[page]);
@@ -266,34 +274,37 @@ function render(html, page) {
 }
 
 fs.mkdirSync(PUBLIC, { recursive: true });
-for (const page of ['index.html', 'zwischentoene.html', 'imprint.html', 'privacy.html']) {
+for (const page of PAGES) {
   const out = render(fs.readFileSync(path.join(SRC, page), 'utf8'), page);
   fs.writeFileSync(path.join(PUBLIC, page), out);
-  console.log(`  ${page.padEnd(22)} ${kb(Buffer.byteLength(out))}`);
+  console.log(`  ${page.padEnd(26)} ${kb(Buffer.byteLength(out))}`);
 }
 
 for (const f of ['robots.txt', 'sitemap.xml', 'site.webmanifest']) {
   const p = path.join(SRC, f);
   if (!fs.existsSync(p)) continue;
   fs.writeFileSync(path.join(PUBLIC, f), render(fs.readFileSync(p, 'utf8'), f));
-  console.log(`  ${f.padEnd(22)} copied`);
+  console.log(`  ${f.padEnd(26)} copied`);
 }
 
-mergeManifest({
-  css: { src: mainCss.url },
-  // The single `js` entry became one per script. Clearing the old key stops
-  // prune() from treating its orphaned file as still referenced — JSON.stringify
-  // drops undefined, so this removes the key rather than nulling it.
-  js: undefined,
+// One key per script. Keys for scripts that no longer exist are cleared, or
+// prune() below would treat their orphaned files as still referenced —
+// JSON.stringify drops undefined, so this removes the key rather than nulling it.
+const stale = Object.keys(manifest).filter((k) => k.startsWith('js_') && !js[k.slice(3)]);
+const next = mergeManifest({
+  ...Object.fromEntries(stale.map((k) => [k, undefined])),
   ...Object.fromEntries(Object.entries(js).map(([n, o]) => [`js_${n}`, { src: o.url }])),
 });
 
-console.log(`  ${'main.css'.padEnd(22)} ${kb(mainCss.bytes)}`);
-for (const [n, o] of Object.entries(js)) console.log(`  ${`${n}.js`.padEnd(22)} ${kb(o.bytes)}`);
+for (const [n, o] of Object.entries(js)) console.log(`  ${`${n}.js`.padEnd(26)} ${kb(o.bytes)}`);
 for (const [p, c] of Object.entries(CRITICAL)) {
-  console.log(`  ${`critical → ${p}`.padEnd(22)} ${kb(Buffer.byteLength(c))}`);
+  console.log(`  ${`critical → ${p}`.padEnd(26)} ${kb(Buffer.byteLength(c))}`);
 }
+
+const removed = prune(next);
+if (removed.length) console.log(`\n  pruned ${removed.length} stale file(s)`);
 
 if (warnings.length) {
   console.warn('\n⚠  ' + warnings.join('\n⚠  '));
+  process.exitCode = 1;
 }
