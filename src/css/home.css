@@ -125,20 +125,6 @@
   padding: var(--studio-top) var(--gutter) var(--gutter);
 }
 
-.studio__text {
-  max-width: 90rem;
-  margin: 0;
-  font-size: var(--studio-size);
-  line-height: 1.04;
-  letter-spacing: -0.035em;
-  text-align: justify;
-  text-justify: auto;
-  hyphens: auto;
-  text-wrap: pretty;
-}
-
-.studio__text + .studio__text { margin-top: 0.55em; }
-
 /* The opening photograph, after the text, centred — a little narrower than
    the picture at the top of the page (40vw against 51vw on a phone), so it
    closes the page without competing with the opening. One line of the
