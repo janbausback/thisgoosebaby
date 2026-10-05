@@ -36,6 +36,11 @@ const PHOTOS = [
   { key: 'zw1', file: 'zwischentoene-1.jpg', widths: [480, 720, 1080] },
   { key: 'zw2', file: 'zwischentoene-2.jpg', widths: [480, 720, 1080] },
   { key: 'zw3', file: 'zwischentoene-3.jpg', widths: [480, 720, 1080] },
+  // The holding page's fast slideshow, drawn at the hero's size.
+  ...Array.from({ length: 13 }, (_, i) => {
+    const n = String(i + 1).padStart(2, '0');
+    return { key: `slide${n}`, file: `slide-${n}.jpg`, widths: [480, 720, 1080] };
+  }),
 ];
 const QUALITY = 74;
 

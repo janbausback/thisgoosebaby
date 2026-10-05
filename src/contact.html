@@ -32,21 +32,19 @@
 <script>document.documentElement.className += ' js';</script>
 <style>{{critical}}</style>
 
-<script src="{{js:menu}}" defer></script>
-
 <script type="application/ld+json">{{jsonld}}</script>
 </head>
 
 <body>
 
-{{header}}
+<!-- Temporary: no menu while the site is a holding page, only the way home. -->
+<header class="top"><a class="top__home" href="/">Studio Kolchina &amp; Gordon</a><a class="top__back" href="/">Go back</a></header>
 
 <main class="main">
   <h1 class="page-title">Contact</h1>
 
   <div class="contact">
     <p><a href="mailto:hello@kolchinagordon.com">hello@kolchinagordon.com</a></p>
-    <address>Studio Kolchina &amp; Gordon<br>Eisenbahnstraße 5<br>10997 Berlin</address>
     <ul class="socials">
       <li><a class="social" href="https://www.instagram.com/_kolchina_/" target="_blank" rel="noopener noreferrer">{{svg:instagram}}<span>Galina Kolchina<span class="visually-hidden"> on Instagram</span></span></a></li>
       <li><a class="social" href="https://www.instagram.com/liamgordon__/" target="_blank" rel="noopener noreferrer">{{svg:instagram}}<span>Liam Gordon<span class="visually-hidden"> on Instagram</span></span></a></li>

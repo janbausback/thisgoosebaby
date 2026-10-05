@@ -32,10 +32,8 @@
 <script>document.documentElement.className += ' js';</script>
 <style>{{critical}}</style>
 
-<script src="{{js:menu}}" defer></script>
 <script src="{{js:slideshow}}" defer></script>
 <script src="{{js:marquee}}" defer></script>
-<script src="{{js:studio}}" defer></script>
 
 <script type="application/ld+json">{{jsonld}}</script>
 </head>
@@ -62,28 +60,56 @@
   </filter>
 </svg>
 
-{{header}}
-
-<main class="home">
+<main class="home home--solo">
   <section class="hero" aria-labelledby="site-title">
     <h1 class="visually-hidden" id="site-title">Studio Kolchina &amp; Gordon</h1>
 
-    <!-- Three photographs, stacked; slideshow.js cuts between them. The first
-         is the one that paints, so it alone is fetched at high priority. -->
-    <div class="hero__frame">
-      <img class="hero__img is-active" src="{{src:hero1}}" srcset="{{srcset:hero1}}"
-           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:hero1}}" height="{{h:hero1}}"
-           alt="Rugs in black, burgundy and ochre hang from the ceiling of the white studio, framing a woven stool"
+    <!-- Thirteen pictures, stacked; slideshow.js cuts between them. The first
+         is the one that paints, so it alone is fetched at high priority. They
+         pass too fast to be read one by one, so they carry no alt text. -->
+    <div class="hero__frame" data-interval="600">
+      <img class="hero__img is-active" src="{{src:slide01}}" srcset="{{srcset:slide01}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide01}}" height="{{h:slide01}}" alt=""
            fetchpriority="high">
-      <img class="hero__img" src="{{src:hero2}}" srcset="{{srcset:hero2}}"
-           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:hero2}}" height="{{h:hero2}}"
-           alt="The graffiti-covered shopfront at Eisenbahnstraße 5, with a woman walking past"
+      <img class="hero__img" src="{{src:slide02}}" srcset="{{srcset:slide02}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide02}}" height="{{h:slide02}}" alt=""
            decoding="async" fetchpriority="low">
-      <img class="hero__img" src="{{src:hero3}}" srcset="{{srcset:hero3}}"
-           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:hero3}}" height="{{h:hero3}}"
-           alt="An olive rug hangs beside an aluminium chest of drawers, under a photograph on the studio wall"
+      <img class="hero__img" src="{{src:slide03}}" srcset="{{srcset:slide03}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide03}}" height="{{h:slide03}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide04}}" srcset="{{srcset:slide04}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide04}}" height="{{h:slide04}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide05}}" srcset="{{srcset:slide05}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide05}}" height="{{h:slide05}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide06}}" srcset="{{srcset:slide06}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide06}}" height="{{h:slide06}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide07}}" srcset="{{srcset:slide07}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide07}}" height="{{h:slide07}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide08}}" srcset="{{srcset:slide08}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide08}}" height="{{h:slide08}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide09}}" srcset="{{srcset:slide09}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide09}}" height="{{h:slide09}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide10}}" srcset="{{srcset:slide10}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide10}}" height="{{h:slide10}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide11}}" srcset="{{srcset:slide11}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide11}}" height="{{h:slide11}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide12}}" srcset="{{srcset:slide12}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide12}}" height="{{h:slide12}}" alt=""
+           decoding="async" fetchpriority="low">
+      <img class="hero__img" src="{{src:slide13}}" srcset="{{srcset:slide13}}"
+           sizes="(min-aspect-ratio: 41/51) 41vh, 51vw" width="{{w:slide13}}" height="{{h:slide13}}" alt=""
            decoding="async" fetchpriority="low">
     </div>
+
+    <a class="hero__contact" href="/contact.html">Contact</a>
 
     <!-- Static and a few repeats long without script; marquee.js rebuilds it
          to the viewport's width and sets it running. -->
@@ -91,21 +117,8 @@
       <svg class="marquee__track" focusable="false"><text class="marquee__text" x="0" y="1.107em" xml:space="preserve">STUDIO KOLCHINA &amp; GORDON&#160;•&#160;STUDIO KOLCHINA &amp; GORDON&#160;•&#160;STUDIO KOLCHINA &amp; GORDON&#160;•&#160;STUDIO KOLCHINA &amp; GORDON&#160;•&#160;</text></svg>
     </div>
   </section>
-
-  <section class="studio" aria-labelledby="studio-title">
-    <h2 class="visually-hidden" id="studio-title">The Studio</h2>
-    <div class="lead">
-      <p>Studio Kolchina &amp; Gordon is an art studio and collaborative project based in Berlin, working at the intersection of art, design, and science. Built around the ongoing partnership between visual artist and curator Galina Kolchina and composer and musician Liam Gordon, the studio brings together brands and artists who share a common vision and sensibility.</p>
-      <p>The studio operates as a place of encounter: a rotating programme of artists and brands.</p>
-    </div>
-    <img class="studio__img" src="{{src:about}}" srcset="{{srcset:about}}"
-         sizes="(min-aspect-ratio: 4/5) 32vh, 40vw" width="{{w:about}}" height="{{h:about}}"
-         alt="Black-and-white photograph of visitors gathered on the pavement outside the studio at Eisenbahnstraße 5"
-         loading="lazy" decoding="async">
-  </section>
 </main>
 
-{{footer}}
 
 </body>
 </html>

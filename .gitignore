@@ -11,3 +11,11 @@ npm-debug.log*
 # instead; these are hundreds of MB and belong in the project archive, not here.
 src/assets/video/*.MOV
 src/assets/video/*.mov
+
+# Camera originals dropped next to the masters; only the cut-down masters
+# (hero-*, slide-*, about, zwischentoene-*) are committed.
+src/assets/photos/*.HEIC
+src/assets/photos/*.MOV
+src/assets/photos/IMG_*
+src/assets/photos/5341688463293619559.jpg
+src/assets/photos/zwischentöne*

@@ -66,6 +66,26 @@
 
 .hero__img.is-active { opacity: 1; }
 
+/* Temporary holding page: the picture and the marquee alone, one screen,
+   nothing to scroll to. */
+.home--solo .hero { height: 100svh; }
+
+/* Low and centred, where a thumb rests on a phone; the padding makes the
+   tap target bigger than the word. */
+.hero__contact {
+  position: absolute;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  padding: 0.75rem 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(0.8125rem, 3.6vw, 1rem);
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hero__contact:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+
 /* ── Marquee ────────────────────────────────────────────────────────────────
    One line through the middle of the picture. marquee.js fills the track with
    two identical halves and the animation slides it left by exactly one half,

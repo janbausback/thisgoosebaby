@@ -96,9 +96,152 @@
     "src": "/assets/menu.c1c26504.js"
   },
   "js_slideshow": {
-    "src": "/assets/slideshow.bcd28387.js"
+    "src": "/assets/slideshow.965beb8b.js"
   },
   "js_studio": {
     "src": "/assets/studio.f09d004d.js"
+  },
+  "slide01": {
+    "widths": {
+      "480": "/assets/slide01-480.f7be19c7.webp",
+      "720": "/assets/slide01-720.06e4023d.webp",
+      "1080": "/assets/slide01-1080.7e5fc44f.webp"
+    },
+    "srcset": "/assets/slide01-480.f7be19c7.webp 480w, /assets/slide01-720.06e4023d.webp 720w, /assets/slide01-1080.7e5fc44f.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide01-1080.7e5fc44f.webp"
+  },
+  "slide02": {
+    "widths": {
+      "480": "/assets/slide02-480.f584ef23.webp",
+      "720": "/assets/slide02-720.39f7dc33.webp",
+      "1080": "/assets/slide02-1080.c492c73a.webp"
+    },
+    "srcset": "/assets/slide02-480.f584ef23.webp 480w, /assets/slide02-720.39f7dc33.webp 720w, /assets/slide02-1080.c492c73a.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide02-1080.c492c73a.webp"
+  },
+  "slide03": {
+    "widths": {
+      "480": "/assets/slide03-480.074c3a44.webp",
+      "720": "/assets/slide03-720.aec12673.webp",
+      "1080": "/assets/slide03-1080.21ac8102.webp"
+    },
+    "srcset": "/assets/slide03-480.074c3a44.webp 480w, /assets/slide03-720.aec12673.webp 720w, /assets/slide03-1080.21ac8102.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide03-1080.21ac8102.webp"
+  },
+  "slide04": {
+    "widths": {
+      "480": "/assets/slide04-480.fb1681ed.webp",
+      "720": "/assets/slide04-720.cab563e7.webp",
+      "1080": "/assets/slide04-1080.b16e4e32.webp"
+    },
+    "srcset": "/assets/slide04-480.fb1681ed.webp 480w, /assets/slide04-720.cab563e7.webp 720w, /assets/slide04-1080.b16e4e32.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide04-1080.b16e4e32.webp"
+  },
+  "slide05": {
+    "widths": {
+      "480": "/assets/slide05-480.b131c2a3.webp",
+      "720": "/assets/slide05-720.d4caef3b.webp",
+      "1080": "/assets/slide05-1080.388c9a45.webp"
+    },
+    "srcset": "/assets/slide05-480.b131c2a3.webp 480w, /assets/slide05-720.d4caef3b.webp 720w, /assets/slide05-1080.388c9a45.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide05-1080.388c9a45.webp"
+  },
+  "slide06": {
+    "widths": {
+      "480": "/assets/slide06-480.2a66cede.webp",
+      "720": "/assets/slide06-720.e9754ad8.webp",
+      "1080": "/assets/slide06-1080.d9016c18.webp"
+    },
+    "srcset": "/assets/slide06-480.2a66cede.webp 480w, /assets/slide06-720.e9754ad8.webp 720w, /assets/slide06-1080.d9016c18.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide06-1080.d9016c18.webp"
+  },
+  "slide07": {
+    "widths": {
+      "480": "/assets/slide07-480.9be9026a.webp",
+      "720": "/assets/slide07-720.a361b741.webp",
+      "1080": "/assets/slide07-1080.5479b9f5.webp"
+    },
+    "srcset": "/assets/slide07-480.9be9026a.webp 480w, /assets/slide07-720.a361b741.webp 720w, /assets/slide07-1080.5479b9f5.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide07-1080.5479b9f5.webp"
+  },
+  "slide08": {
+    "widths": {
+      "480": "/assets/slide08-480.6073aed2.webp",
+      "720": "/assets/slide08-720.4ca950c8.webp",
+      "1080": "/assets/slide08-1080.d71e627d.webp"
+    },
+    "srcset": "/assets/slide08-480.6073aed2.webp 480w, /assets/slide08-720.4ca950c8.webp 720w, /assets/slide08-1080.d71e627d.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide08-1080.d71e627d.webp"
+  },
+  "slide09": {
+    "widths": {
+      "480": "/assets/slide09-480.766a1b65.webp",
+      "720": "/assets/slide09-720.71cd2809.webp",
+      "1080": "/assets/slide09-1080.a503620b.webp"
+    },
+    "srcset": "/assets/slide09-480.766a1b65.webp 480w, /assets/slide09-720.71cd2809.webp 720w, /assets/slide09-1080.a503620b.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide09-1080.a503620b.webp"
+  },
+  "slide10": {
+    "widths": {
+      "480": "/assets/slide10-480.98eb89d8.webp",
+      "720": "/assets/slide10-720.2595e74f.webp",
+      "1080": "/assets/slide10-1080.b08158eb.webp"
+    },
+    "srcset": "/assets/slide10-480.98eb89d8.webp 480w, /assets/slide10-720.2595e74f.webp 720w, /assets/slide10-1080.b08158eb.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide10-1080.b08158eb.webp"
+  },
+  "slide11": {
+    "widths": {
+      "480": "/assets/slide11-480.9632bea1.webp",
+      "720": "/assets/slide11-720.ceec4a01.webp",
+      "1080": "/assets/slide11-1080.3ee7a3c2.webp"
+    },
+    "srcset": "/assets/slide11-480.9632bea1.webp 480w, /assets/slide11-720.ceec4a01.webp 720w, /assets/slide11-1080.3ee7a3c2.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide11-1080.3ee7a3c2.webp"
+  },
+  "slide12": {
+    "widths": {
+      "480": "/assets/slide12-480.6568bc00.webp",
+      "720": "/assets/slide12-720.fff30fa6.webp",
+      "1080": "/assets/slide12-1080.8035b711.webp"
+    },
+    "srcset": "/assets/slide12-480.6568bc00.webp 480w, /assets/slide12-720.fff30fa6.webp 720w, /assets/slide12-1080.8035b711.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide12-1080.8035b711.webp"
+  },
+  "slide13": {
+    "widths": {
+      "480": "/assets/slide13-480.0643435a.webp",
+      "720": "/assets/slide13-720.a101518e.webp",
+      "1080": "/assets/slide13-1080.e3e52bf3.webp"
+    },
+    "srcset": "/assets/slide13-480.0643435a.webp 480w, /assets/slide13-720.a101518e.webp 720w, /assets/slide13-1080.e3e52bf3.webp 1080w",
+    "w": 1080,
+    "h": 1440,
+    "src": "/assets/slide13-1080.e3e52bf3.webp"
   }
 }

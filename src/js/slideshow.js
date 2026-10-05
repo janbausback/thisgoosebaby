@@ -4,10 +4,11 @@
 (() => {
   'use strict';
 
-  const INTERVAL_MS = 2000;
-
   let slides = Array.from(document.querySelectorAll('.hero__img'));
   if (slides.length < 2) return;
+
+  // `data-interval` on the frame overrides the pace, in milliseconds.
+  const INTERVAL_MS = Number(slides[0].parentElement.dataset.interval) || 2000;
 
   let index = Math.max(0, slides.findIndex((img) => img.classList.contains('is-active')));
   let timer = 0;

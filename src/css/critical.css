@@ -108,7 +108,8 @@ a { color: inherit; }
    the marquee already says it. The padding is hit area; `top` takes it back
    out so the cap tops sit level with the burger's upper line. In line with
    the left edge of the text column, as the burger is with its right. */
-.top__home {
+.top__home,
+.top__back {
   position: absolute;
   top: calc(var(--burger-y) + env(safe-area-inset-top) - 0.95em);
   left: calc(var(--gutter) + env(safe-area-inset-left));
@@ -122,6 +123,13 @@ a { color: inherit; }
   white-space: nowrap;
   transition: opacity 200ms ease, visibility 0s linear 0s;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Its mirror in the right corner, for pages shown without the menu. */
+.top__back {
+  left: auto;
+  right: calc(var(--gutter) + env(safe-area-inset-right));
+  padding: 0.75em 0 0.75em 0.5em;
 }
 
 /* Steps aside while the menu is open: on a narrow phone it would otherwise
