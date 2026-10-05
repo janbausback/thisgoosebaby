@@ -138,6 +138,7 @@ const organization = {
   email: 'hello@kolchinagordon.com',
   telephone: '+4915221465761',
   address,
+  sameAs: 'https://www.instagram.com/studio.kolchina.gordon/',
   founder: [
     {
       '@type': 'Person',
